@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import ServiceProvider, ServiceCategory, Service
+from django.db.models import Q
 from django.http import Http404
 
 # Vistas para la sección de búsqueda y perfiles
@@ -19,7 +20,10 @@ def service_search_view(request):
     if 'query' in request.GET:
         query = request.GET['query']
         # Buscar en los campos del modelo que coincidan con la palabra clave
-        providers = providers.filter(description__icontains=query)
+        providers = providers.filter(
+            Q(description__icontains=query) |
+            Q(services__name__icontains=query)
+        ).distinct()
 
     # Procesar el filtro por categoría
     if 'category' in request.GET and request.GET['category']:
