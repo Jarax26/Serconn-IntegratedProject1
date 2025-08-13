@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Búsqueda de Servicios - SERCONN</title>
+</head>
+<body>
+    <h1>Búsqueda de Servicios</h1>
+    <form action="{% url 'service_search' %}" method="get">
+        <!-- Campo de búsqueda por palabra clave (FR-3) -->
+        <input type="text" name="query" placeholder="Ej: Plomero, Tutor de inglés..." value="{{ query|default:'' }}">
+        
+        <!-- Filtro por categoría (FR-2) -->
+        <select name="category">
+            <option value="">Todas las categorías</option>
+            {% for category in categories %}
+                <option value="{{ category.name }}" {% if category.name == selected_category %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">Buscar</button>
+    </form>
+
+    <hr>
+
+    <h2>Resultados de Búsqueda</h2>
+    {% if providers %}
+        <ul>
+            {% for provider in providers %}
+                <li>
+                    <!-- Enlace al perfil del proveedor (FR-5) -->
+                    <a href="{% url 'provider_detail' provider.id %}">
+                        <h3>{{ provider.user }}</h3>
+                    </a>
+                    <p>{{ provider.description|truncatechars:150 }}</p>
+                    <small>Servicios ofrecidos:</small>
+                    <ul>
+                        {% for service in provider.services.all %}
+                            <li>{{ service.name }} - ${{ service.rate }}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron proveedores que coincidan con la búsqueda.</p>
+    {% endif %}
+
+</body>
+</html>

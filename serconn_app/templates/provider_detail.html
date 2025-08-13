@@ -1,0 +1,36 @@
+<!-- serconn_app/templates/serconn_app/provider_detail.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ provider.user }} - Perfil</title>
+</head>
+<body>
+    <h1>Perfil de {{ provider.user }}</h1>
+    {% if provider.profile_picture %}
+        <img src="{{ provider.profile_picture.url }}" alt="Foto de perfil de {{ provider.user.username }}" width="150">
+    {% else %}
+        <p></p>
+    {% endif %}
+    <p>{{ provider.description }}</p>
+
+    <h2>Servicios y Precios</h2>
+    {% if services_offered %}
+        <ul>
+            {% for service in services_offered %}
+                <li>
+                    <strong>{{ service.name }}</strong>
+                    <p>{{ service.description }}</p>
+                    <p>Costo: ${{ service.rate }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Este proveedor aún no ha listado sus servicios.</p>
+    {% endif %}
+
+    <!-- Aquí se podrían añadir las secciones para reseñas, contacto, etc. -->
+
+</body>
+</html>
