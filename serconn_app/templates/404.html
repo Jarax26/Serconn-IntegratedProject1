@@ -1,13 +1,44 @@
+<!-- serconn_app/templates/404.html -->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página no encontrada</title>
+    <title>Página no encontrada - SERCONN</title>
+    <!-- Incluyendo Tailwind CSS desde su CDN para un estilo rápido y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f9fb; /* Un fondo claro y suave */
+        }
+    </style>
 </head>
-<body>
-    <h1>¡Ups! Página no encontrada</h1>
-    <p>Lo sentimos, la página que buscas no existe o ha sido movida.</p>
-    <a href="/">Volver al inicio</a>
+<body class="flex flex-col min-h-screen">
+    <!-- Barra de navegación superior (Header) -->
+    <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-2xl font-bold text-gray-800">
+            <a href="{% url 'service_search' %}">SERCONN</a>
+        </h1>
+        <nav>
+            <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md">
+                Buscar Servicios
+            </a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-16 flex-grow flex items-center justify-center">
+        <div class="bg-white p-10 md:p-16 rounded-2xl shadow-xl max-w-lg mx-auto text-center">
+            <div class="text-indigo-600 text-9xl font-extrabold">404</div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mt-6 mb-4">¡Ups! Página no encontrada</h1>
+            <p class="text-lg md:text-xl text-gray-600">Lo sentimos, la página que buscas no existe, ha sido eliminada o la dirección es incorrecta.</p>
+            <a href="{% url 'service_search' %}" class="inline-block mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-lg">
+                Volver a la Búsqueda
+            </a>
+        </div>
+    </main>
 </body>
 </html>

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 # Un modelo de perfil para ServiceProvider que se extiende del User de Django
 class ServiceProvider(models.Model):
-    user = models.TextField()
+    user = models.CharField(max_length=200)
     profile_picture = models.ImageField(upload_to='profiles')
     description = models.TextField()
     is_verified = models.BooleanField(default=False)

@@ -1,52 +1,105 @@
+<!-- serconn_app/templates/serconn_app/service_search.html -->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Búsqueda de Servicios - SERCONN</title>
+    <!-- Incluyendo Tailwind CSS desde su CDN para un estilo rápido y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f9fb; /* Un fondo claro y suave */
+        }
+    </style>
 </head>
-<body>
-    <h1>Búsqueda de Servicios</h1>
-    <form action="{% url 'service_search' %}" method="get">
-        <!-- Campo de búsqueda por palabra clave (FR-3) -->
-        <input type="text" name="query" placeholder="Ej: Plomero, Tutor de inglés..." value="{{ query|default:'' }}">
-        
-        <!-- Filtro por categoría (FR-2) -->
-        <select name="category">
-            <option value="">Todas las categorías</option>
-            {% for category in categories %}
-                <option value="{{ category.name }}" {% if category.name == selected_category %}selected{% endif %}>
-                    {{ category.name }}
-                </option>
-            {% endfor %}
-        </select>
-        
-        <button type="submit">Buscar</button>
-    </form>
+<body class="flex flex-col min-h-screen">
+    <!-- Barra de navegación superior (Header) -->
+    <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-2xl font-bold text-gray-800">
+            <a href="{% url 'service_search' %}">SERCONN</a>
+        </h1>
+        <nav>
+            <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md">
+                Buscar Servicios
+            </a>
+        </nav>
+    </header>
 
-    <hr>
-
-    <h2>Resultados de Búsqueda</h2>
-    {% if providers %}
-        <ul>
-            {% for provider in providers %}
-                <li>
-                    <!-- Enlace al perfil del proveedor (FR-5) -->
-                    <a href="{% url 'provider_detail' provider.id %}">
-                        <h3>{{ provider.user }}</h3>
-                    </a>
-                    <p>{{ provider.description|truncatechars:150 }}</p>
-                    <small>Servicios ofrecidos:</small>
-                    <ul>
-                        {% for service in provider.services.all %}
-                            <li>{{ service.name }} - ${{ service.rate }}</li>
+    <main class="container mx-auto px-4 py-8 md:py-12 flex-grow">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-2xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Encuentra el Servicio que Necesitas</h2>
+            <form action="{% url 'service_search' %}" method="get" class="space-y-4">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <!-- Campo de búsqueda por palabra clave (FR-3) -->
+                    <input type="text" name="query" placeholder="Ej: Plomero, Tutor de inglés..." value="{{ query|default:'' }}" 
+                           class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                    
+                    <!-- Filtro por categoría (FR-2) -->
+                    <select name="category" class="p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                        <option value="">Todas las categorías</option>
+                        {% for category in categories %}
+                            <option value="{{ category.name }}" {% if category.name == selected_category %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
                         {% endfor %}
-                    </ul>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No se encontraron proveedores que coincidan con la búsqueda.</p>
-    {% endif %}
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-full transition-colors duration-300 shadow-lg">
+                    Buscar
+                </button>
+            </form>
+        </div>
 
+        <section class="mt-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Resultados de Búsqueda</h2>
+            {% if providers %}
+                <ul class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for provider in providers %}
+                        <li class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                            <!-- Enlace al perfil del proveedor (FR-5) -->
+                            <a href="{% url 'provider_detail' provider.id %}" class="flex-grow">
+                                <div class="flex items-center mb-4">
+                                    {% if provider.profile_picture %}
+                                        <img src="{{ provider.profile_picture.url }}" alt="Foto de perfil de {{ provider.user }}" class="w-16 h-16 rounded-full object-cover mr-4">
+                                    {% else %}
+                                        <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xl font-bold mr-4">
+                                            {{ provider.user|slice:":1" }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-indigo-600 hover:text-indigo-800 transition-colors duration-200">{{ provider.user }}</h3>
+                                        <p class="text-sm text-gray-500">Proveedor de servicios</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 mt-2">{{ provider.description|truncatewords:25 }}</p>
+                            </a>
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <h4 class="font-semibold text-gray-700 mb-2">Servicios que ofrece:</h4>
+                                <ul class="list-disc list-inside text-gray-600">
+                                    {% for service in provider.services.all|slice:":3" %}
+                                        <li>{{ service.name }} - <span class="font-bold">${{ service.rate|floatformat:0 }}</span></li>
+                                    {% endfor %}
+                                    {% if provider.services.count > 3 %}
+                                        <li class="text-sm text-gray-500">...y más.</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="text-center text-gray-500 p-8 bg-gray-50 rounded-2xl shadow-inner">
+                    <p class="text-lg">No se encontraron proveedores que coincidan con la búsqueda.</p>
+                    <p class="mt-2">Intenta con otros términos o categorías.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
 </body>
 </html>
