@@ -87,7 +87,7 @@
                                             <li>{{ service.name }} - <span class="font-bold">${{ service.rate|floatformat:0 }}</span></li>
                                         {% endfor %}
                                         {% if provider.services.count > 3 %}
-                                            <li class="text-sm text-gray-500">...y más.</li>
+                                            <li><a href="{% url 'provider_detail' provider.id %}" class="text-sm text-gray-500 font-bold hover:text-indigo-800 transition-colors duration-200">...y más.</a></li>
                                         {% endif %}
                                     </ul>
                                 </div>

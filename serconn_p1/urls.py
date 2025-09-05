@@ -16,18 +16,19 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from django.conf import settings
 from django.conf.urls.static import static
 
-from serconn_app import views as appViews
+from searching import views as appViews
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", appViews.service_search_view, name="service_search"),
-    path("provider/<int:provider_id>/", appViews.provider_detail_view, name="provider_detail"),
-
+    path('admin/', admin.site.urls),
+    path('', include('searching.urls')),  # Las URLs de la app 'searching' serán la página de inicio
+    # path('accounts/', include('accounts.urls')),
+    # path('payments/', include('payments.urls')),
+    # path('interactions/', include('interactions.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

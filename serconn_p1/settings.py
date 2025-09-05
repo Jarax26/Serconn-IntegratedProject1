@@ -42,7 +42,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "serconn_app",
+    "searching",
+    "accounts",
+    "payments",
+    "interactions",
 ]
 
 MIDDLEWARE = [
