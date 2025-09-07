@@ -1,0 +1,151 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro - SERCONN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+    body { font-family: 'Poppins', sans-serif; background-color: #f7f9fb; }
+  </style>
+</head>
+
+<body class="min-h-screen">
+  <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-gray-800">
+      <a href="{% url 'login' %}">SERCONN</a>
+    </h1>
+  </header>
+
+  <main class="flex-grow flex items-center justify-center px-4 py-10">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg w-full">
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Crear cuenta</h2>
+
+      <!-- Mensajes de error del form -->
+      {% if form.errors %}
+        <div class="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
+          <ul>
+            {% for field in form %}
+              {% if field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ field.errors|join:", " }}</li>
+              {% endif %}
+            {% endfor %}
+            {% if form.non_field_errors %}
+              <li>{{ form.non_field_errors }}</li>
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- SIEMPRE visible -->
+      <p class="text-center text-gray-600 mb-6">
+        ¿Ya tienes una cuenta?
+        <a href="{% url 'login' %}" class="text-indigo-600 hover:underline font-semibold">Inicia sesión</a>
+      </p>
+
+      <!-- Botones de rol -->
+      <div class="flex gap-4 justify-center mb-6">
+        <button type="button" id="seekerBtn"
+          class="px-6 py-3 rounded-lg bg-gray-200 text-gray-800 font-semibold transition-colors duration-300">
+          Quiero buscar servicios
+        </button>
+        <button type="button" id="providerBtn"
+          class="px-6 py-3 rounded-lg bg-gray-200 text-gray-800 font-semibold transition-colors duration-300">
+          Quiero ofrecer servicios
+        </button>
+      </div>
+
+      <!-- Formulario (oculto al inicio si no hay rol) -->
+      <form method="post" enctype="multipart/form-data"
+            class="space-y-6 {% if not form.data.user_role %}hidden{% endif %}" id="registerForm">
+        {% csrf_token %}
+
+        <!-- Campo oculto del rol (usa el del form para id/validación correcta) -->
+        {{ form.user_role.as_hidden }}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="{{ form.first_name.id_for_label }}" class="block text-gray-700 font-semibold">Nombre</label>
+            {{ form.first_name }}
+          </div>
+          <div>
+            <label for="{{ form.last_name.id_for_label }}" class="block text-gray-700 font-semibold">Apellido</label>
+            {{ form.last_name }}
+          </div>
+          <div>
+            <label for="{{ form.user_birthdate.id_for_label }}" class="block text-gray-700 font-semibold">Fecha de Nacimiento</label>
+            {{ form.user_birthdate }}
+          </div>
+          <div>
+            <label for="{{ form.user_city.id_for_label }}" class="block text-gray-700 font-semibold">Ciudad</label>
+            {{ form.user_city }}
+          </div>
+          <div>
+            <label for="{{ form.user_address.id_for_label }}" class="block text-gray-700 font-semibold">Dirección</label>
+            {{ form.user_address }}
+          </div>
+          <div>
+            <label for="{{ form.user_phone.id_for_label }}" class="block text-gray-700 font-semibold">Teléfono</label>
+            {{ form.user_phone }}
+          </div>
+          <div>
+            <label for="{{ form.email.id_for_label }}" class="block text-gray-700 font-semibold">Correo Electrónico</label>
+            {{ form.email }}
+          </div>
+          <div>
+            <label for="{{ form.password1.id_for_label }}" class="block text-gray-700 font-semibold">Contraseña</label>
+            {{ form.password1 }}
+          </div>
+          <div>
+            <label for="{{ form.password2.id_for_label }}" class="block text-gray-700 font-semibold">Confirmar Contraseña</label>
+            {{ form.password2 }}
+          </div>
+
+          <!-- Foto de perfil -->
+          <div class="md:col-span-2">
+            <label for="id_user_picture" class="block text-gray-700 font-semibold mb-2">Foto de perfil</label>
+            <!-- Forzamos un id conocido para el JS -->
+            <input type="file" name="user_picture" id="id_user_picture" accept="image/*"
+              class="block w-full text-sm text-gray-600 cursor-pointer
+                     file:mr-4 file:py-2 file:px-4
+                     file:rounded-full file:border-0
+                     file:text-sm file:font-semibold
+                     file:bg-indigo-50 file:text-indigo-700
+                     hover:file:bg-indigo-100">
+            <p class="mt-1 text-sm text-gray-500">PNG, JPG o GIF (máx. 2MB)</p>
+            <span id="fileError" class="hidden text-red-600 font-bold flex items-center gap-2">
+                Debes subir una foto de perfil
+            </span>
+          </div>
+        </div>
+
+        <!-- Campos específicos del provider -->
+        <div id="providerFields"
+             class="mt-6 {% if form.data.user_role != 'service_provider' %}hidden{% endif %}">
+          <label for="{{ form.description.id_for_label }}" class="block text-gray-700 font-semibold">
+            {{ form.description.label }}
+          </label>
+          {{ form.description }}
+        </div>
+
+        <button type="submit"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-full shadow-lg mt-8">
+          Registrarme
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script src="{% static 'script.js' %}"></script>
+
+  <!-- Si hubo POST con rol, re-selecciona rol para mantener el estado visible -->
+  {% if form.data.user_role %}
+    <script>
+      window.__initialSelectedRole = "{{ form.data.user_role|escapejs }}";
+    </script>
+  {% endif %}
+</body>
+</html>

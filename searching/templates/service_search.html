@@ -24,7 +24,9 @@
         <h1 class="text-2xl font-bold text-gray-800">
             <a href="{% url 'service_search' %}">SERCONN</a>
         </h1>
-        <nav class="flex items-center gap-4">
+        <nav>
+            <a href="{% url 'logout' %}" 
+            class="text-sm text-gray-600 hover:text-indigo-600 font-semibold">Cerrar sesión</a>
             <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md">
                 Buscar Servicios
             </a>
