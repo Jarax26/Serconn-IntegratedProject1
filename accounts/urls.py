@@ -1,5 +1,9 @@
 from django.urls import path
+from . import views
 
 urlpatterns = [
-    # Puedes agregar tus patrones de URL aquí más adelante
+    path('register/', views.register, name='register'),
+    path('', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('provider_dashboard/', views.provider_dashboard, name='provider_dashboard'),
 ]

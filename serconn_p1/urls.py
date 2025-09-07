@@ -24,9 +24,9 @@ from django.conf.urls.static import static
 from searching import views as appViews
 
 urlpatterns = [
+    path('', include('accounts.urls')),
     path('admin/', admin.site.urls),
-    path('', include('searching.urls')),  # Las URLs de la app 'searching' serán la página de inicio
-    # path('accounts/', include('accounts.urls')),
+    path('search/', include('searching.urls')),
     # path('payments/', include('payments.urls')),
     # path('interactions/', include('interactions.urls')),
 ]

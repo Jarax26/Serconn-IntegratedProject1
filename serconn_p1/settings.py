@@ -83,12 +83,17 @@ WSGI_APPLICATION = "serconn_p1.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'serconn_db',
+        'USER': 'root', # o el usuario que hayas configurado
+        'PASSWORD': '12345678', # ingresar contraseña de la base de datos
+        'HOST': 'localhost',  # o la IP del servidor de MySQL
+        'PORT': '3306', # El puerto por defecto
     }
 }
 
+AUTH_USER_MODEL = "accounts.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
