@@ -33,8 +33,8 @@ def login_view(request):
             # Redirección según rol
             if user.user_role == "service_seeker": # pyright: ignore[reportAttributeAccessIssue]
                 return redirect("service_search")   # Vista buscador
-            elif user.user_role == "service_provider": # pyright: ignore[reportAttributeAccessIssue]
-                return redirect("provider_dashboard")  # Vista proveedor
+            # elif user.user_role == "service_provider": # pyright: ignore[reportAttributeAccessIssue]
+            #     return redirect("provider_dashboard")  Vista proveedor
             else:
                 return redirect("service_search")  # fallback
         else:
