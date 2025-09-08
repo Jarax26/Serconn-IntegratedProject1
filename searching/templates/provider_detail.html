@@ -1,11 +1,9 @@
-<!-- serconn_app/templates/serconn_app/provider_detail.html -->
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ provider.user.username }} - Perfil</title>
+    <title>{{ user.first_name }} - Perfil</title>
     <!-- Incluyendo Tailwind CSS desde su CDN para un estilo rápido y moderno -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -24,25 +22,52 @@
             <a href="{% url 'service_search' %}">SERCONN</a>
         </h1>
         <nav>
-            <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md">
-                Buscar Servicios
-            </a>
+            {% if user.is_authenticated %}
+                <div class="relative">
+                    <button id="profile-menu-btn" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-full transition-colors duration-300">
+                        {% if user.user_picture %}
+                            <img src="{{ user.user_picture.url }}" alt="Perfil" class="w-8 h-8 rounded-full object-cover">
+                        {% else %}
+                            <span class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center font-bold">{{ user.username|slice:":1" }}</span>
+                        {% endif %}
+                        {{ user.get_full_name|default:user.username }}
+                    </button>
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg hidden z-50">
+                        {% if user.is_service_provider %}
+                            <a href="{% url 'profile' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Perfil</a>
+                            <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Agregar servicios</a>
+                            <a href="{% url 'seeker_dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
+                        {% else %}
+                            <a href="{% url 'seeker_dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis solicitudes</a>
+                        {% endif %}
+                        <form action="{% url 'logout' %}" method="post" style="margin:0;">
+                            {% csrf_token %}
+                            <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-indigo-50 text-gray-700">Cerrar sesión</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="text-indigo-600 hover:text-indigo-800 font-semibold px-4 py-2">Iniciar sesión</a>
+                <a href="{% url 'register' %}" class="text-indigo-600 hover:text-indigo-800 font-semibold px-4 py-2">Registrarse</a>
+            {% endif %}
         </nav>
     </header>
 
     <main class="container mx-auto px-4 py-8 md:py-12 flex-grow">
         <div class="bg-white p-6 md:p-10 rounded-2xl shadow-xl max-w-4xl mx-auto">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-8 border-b pb-8 mb-8">
-                {% if provider.profile_picture %}
-                    <img src="{{ provider.profile_picture.url }}" alt="Foto de perfil de {{ provider.user.username }}" class="w-32 h-32 rounded-full object-cover flex-shrink-0">
+                <!-- Foto de perfil del proveedor -->
+                {% if provider.user.user_picture %}
+                    <img src="{{ provider.user.user_picture.url }}" alt="Foto de perfil de {{ provider.user.username }}" class="w-32 h-32 rounded-full object-cover flex-shrink-0">
                 {% else %}
                     <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-5xl font-bold flex-shrink-0">
-                        {{ provider.user|slice:":1" }}
+                        {{ provider.user.first_name|slice:":1" }}
                     </div>
                 {% endif %}
                 <div class="text-center md:text-left">
-                    <h1 class="text-4xl font-bold text-gray-800">{{ provider.user }}</h1>
-                    <p class="mt-2 text-xl text-gray-600">{{ provider.description }}</p>
+                    <h1 class="text-4xl font-bold text-gray-800">{{ provider.user.get_full_name|default:provider.user.username }}</h1>
+                    <p class="text-gray-600 font-bold">Score: {{ provider.user.user_score }}</p>
+                    <p class="mt-2 text-xl text-gray-600">{{ provider.user.service_provider_profile.description|default:"Sin descripción" }}</p>
                 </div>
             </div>
 
@@ -66,5 +91,30 @@
             </section>
         </div>
     </main>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuBtn = document.getElementById('profile-menu-btn');
+            const dropdown = document.getElementById('profile-dropdown');
+
+            if (menuBtn && dropdown) {
+                menuBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!dropdown.classList.contains('hidden')) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+
+                dropdown.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
 </body>
 </html>

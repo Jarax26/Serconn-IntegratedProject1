@@ -5,6 +5,14 @@ from django.db import models
 # Custom user model extending AbstractUser
 class User(AbstractUser):
 
+    @property
+    def is_service_provider(self):
+        return self.user_role == "service_provider"
+
+    @property
+    def is_service_seeker(self):
+        return self.user_role == "service_seeker"
+    
     username = None
     email = models.EmailField(unique=True)
 
@@ -57,7 +65,8 @@ class ServiceProvider(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Provider profile of {self.user.username}"
+        return f"Provider profile of {self.user.email}"
+
     
 
 # Model for service provider experiences

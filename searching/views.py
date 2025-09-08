@@ -1,32 +1,34 @@
-from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import ServiceProvider, ServiceCategory, Service
+from .models import ServiceCategory, Service
 from django.db.models import Q
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from .models import ServiceRequest
-from .forms import ServiceProviderForm
+from accounts.models import ServiceProvider
+from .forms import ServiceForm
 
-# Vistas para la sección de búsqueda y perfiles
+
+@login_required
 def service_search_view(request):
     """
     Vista principal para la búsqueda de servicios.
     """
-    # Obtener todas las categorías de servicio para el menú desplegable
     categories = ServiceCategory.objects.all()
     
-    # Inicializar la lista de proveedores
-    providers = ServiceProvider.objects.all()
-    query = request.GET.get('query', None)
-    category = request.GET.get('category', None)
+    # Solo proveedores con al menos un servicio
+    providers = ServiceProvider.objects.select_related("user").filter(services__isnull=False).distinct()
+    
+    query = request.GET.get('query')
+    category = request.GET.get('category')
 
     if query:
         providers = providers.filter(
-            Q(service_info__icontains=query) |
-            Q(profession__icontains=query) |
-            Q(services_offered__icontains=query) |
-            Q(services__name__icontains=query)
+            Q(description__icontains=query) |  
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(services__name__icontains=query) |
+            Q(services__description__icontains=query)
         ).distinct()
 
     if category:
@@ -58,9 +60,6 @@ def provider_detail_view(request, provider_id):
         'provider': provider,
         'services_offered': services_offered,
     }
-<<<<<<< HEAD:searching/views.py
-    return render(request, 'provider_detail.html', context)
-=======
     return render(request, 'provider_detail.html', context)
 
 @login_required
@@ -69,43 +68,15 @@ def seeker_dashboard(request):
     return render(request, 'seeker_dashboard.html', {'service_requests': service_requests})
 
 @login_required
-def confirm_service(request, pk):
-    service_request = get_object_or_404(ServiceRequest, pk=pk)
-    user = request.user
-
-    # Seeker confirma
-    if user == service_request.seeker:
-        service_request.seeker_confirmed = True
-    # Provider confirma
-    elif hasattr(service_request, 'provider') and user == service_request.provider.user:
-        service_request.provider_confirmed = True
-
-    service_request.save()
-    return redirect('seeker_dashboard')
-
-@login_required
-def provider_profile(request):
-    provider, created = ServiceProvider.objects.get_or_create(user=request.user)
-    if request.method == 'POST':
-        form = ServiceProviderForm(request.POST, request.FILES, instance=provider)
+def add_service(request):
+    provider = get_object_or_404(ServiceProvider, user=request.user)
+    if request.method == "POST":
+        form = ServiceForm(request.POST)
         if form.is_valid():
-            form.save()
-            # Permanecer en la misma página después de guardar
-            return redirect('provider_profile')
+            service = form.save(commit=False)
+            service.provider = provider
+            service.save()
+            return redirect("profile")
     else:
-        form = ServiceProviderForm(instance=provider)
-    return render(request, 'provider_profile.html', {'form': form, 'provider': provider})
-
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            # Crea el perfil de proveedor automáticamente
-            from .models import ServiceProvider
-            ServiceProvider.objects.create(user=user)
-            return redirect('login')
-    else:
-        form = UserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
->>>>>>> c1cd290 (Avance chao):serconn_app/views.py
+        form = ServiceForm()
+    return render(request, "add_service.html", {"form": form})

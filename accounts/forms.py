@@ -73,3 +73,38 @@ class CustomUserCreationForm(UserCreationForm):
             self.fields["description"].required = True
         else:
             self.fields["description"].required = False
+
+class ServiceProviderForm(forms.ModelForm):
+    class Meta:
+        model = ServiceProvider
+        fields = ["description"]
+        widgets = {
+            "description": forms.Textarea(attrs={"class": "border rounded-lg p-2 w-full", "rows": 4}),
+        }
+        labels = {
+            "description": "Descripción",
+        }
+
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email", "user_city", "user_address",  "user_phone", "user_picture"]
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
+            "last_name": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
+            "email": forms.EmailInput(attrs={"class": "border rounded-lg p-2 w-full"}),
+            "user_city": forms.Select(attrs={"class": "border rounded-lg p-2 w-full"}),
+            "user_address": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
+            "user_phone": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
+            "user_picture": forms.ClearableFileInput(attrs={"class": "border rounded-lg p-2 w-full"}),
+        }
+        labels = {
+            "first_name": "Nombres",
+            "last_name": "Apellidos",
+            "user_city": "Ciudad",
+            "user_address": "Dirección",
+            "user_phone": "Teléfono",
+            "email": "Correo Electrónico",
+            "user_picture": "Foto de Perfil",
+        }
+

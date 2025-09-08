@@ -1,36 +1,26 @@
 from django.db import models
 from django.conf import settings
-
-# Un modelo de perfil para ServiceProvider que se extiende del User de Django
-class ServiceProvider(models.Model):
-    user = models.OneToOneField('auth.User', on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=50, blank=True)
-    last_name = models.CharField(max_length=50, blank=True)
-    profession = models.CharField(max_length=100, blank=True)
-    service_info = models.TextField(blank=True)
-    rates = models.CharField(max_length=100, blank=True)
-    availability = models.CharField(max_length=100, blank=True)
-    profile_picture = models.ImageField(upload_to='provider_profiles/', blank=True, null=True)
-    contact_number = models.CharField(max_length=20, blank=True)
-    services_offered = models.CharField(max_length=200, blank=True)
-    # ...otros campos...
-
-    def __str__(self):
-        return self.user.username
+from accounts.models import ServiceProvider
 
 
 class ServiceCategory(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
+    
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Categoría de servicio"
+        verbose_name_plural = "Categorías de servicios"
 
 
 class Service(models.Model):
-    provider = models.ForeignKey(ServiceProvider, on_delete=models.CASCADE, related_name='services')
-    category = models.ForeignKey(ServiceCategory, on_delete=models.CASCADE)
+    provider = models.ForeignKey(ServiceProvider, on_delete=models.CASCADE, related_name="services")
+    category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=200)
     description = models.TextField()
-    rate = models.DecimalField(max_digits=10, decimal_places=2) # FR-8
-
-
+    rate = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class ServiceRequest(models.Model):
