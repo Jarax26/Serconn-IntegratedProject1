@@ -70,7 +70,7 @@
             {% endif %}
             <div>
                 <h3 class="text-xl font-bold text-indigo-700">{{ user.get_full_name|default:user.username }}</h3>
-                <p class="text-gray-600"> Score: {{ user.user_score }}</p>
+                <p class="text-gray-600"> Score: {{ user.user_score }} ⭐</p>
                 <a href="{% url 'dashboard' %}" class="text-indigo-600 hover:underline font-semibold block mt-2">Ver mis
                     solicitudes</a>
             </div>
@@ -82,7 +82,7 @@
                 <div class="flex flex-col md:flex-row gap-4">
                     <!-- Campo de búsqueda por palabra clave (FR-3) -->
                     <input type="text" name="query" placeholder="Ej: Plomero, Tutor de inglés..." value="{{ query|default:'' }}" 
-                           class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                            class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
                     
                     <!-- Filtro por categoría (FR-2) -->
                     <select name="category" class="p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
@@ -124,7 +124,7 @@
                                         </div>
                                     </div>
                                     <!-- Descripción y score del proveedor -->
-                                    <p class="text-gray-600 font-bold">Score: {{ provider.user.user_score }}</p>
+                                    <p class="text-gray-600 font-bold">Score: {{ provider.user.user_score }} ⭐</p>
                                     <p class="text-gray-600 mt-2">{{ provider.user.service_provider_profile.description|default:"Sin descripción" }}</p>
                                 </a>
 

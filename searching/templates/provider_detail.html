@@ -59,7 +59,7 @@
                 {% endif %}
                 <div class="text-center md:text-left">
                     <h1 class="text-4xl font-bold text-gray-800">{{ provider.user.get_full_name|default:provider.user.username }}</h1>
-                    <p class="text-gray-600 font-bold">Score: {{ provider.user.user_score }}</p>
+                    <p class="text-gray-600 font-bold">Score: {{ provider.user.user_score }} ⭐</p>
                     <p class="mt-2 text-xl text-gray-600">{{ provider.user.service_provider_profile.description|default:"Sin descripción" }}</p>
                     
                     {% if user.is_authenticated and user.is_service_seeker %}
@@ -94,9 +94,5 @@
             </section>
         </div>
     </main>
-
-    <script>
-        // ... (Tu script existente para el dropdown) ...
-    </script>
 </body>
 </html>

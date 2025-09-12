@@ -24,7 +24,6 @@
             {% endif %}
             <div>
                 <h2 class="text-2xl font-bold text-indigo-700">{{ profile_user.get_full_name }}</h2>
-                <p class="text-gray-600">{{ profile_user.email }}</p>
                 <p class="mt-1 px-3 py-1 text-sm inline-block rounded-full {% if profile_user.is_service_provider %} bg-blue-100 text-blue-800 {% else %} bg-green-100 text-green-800 {% endif %}">
                     {{ profile_user.get_user_role_display }}
                 </p>
@@ -32,7 +31,7 @@
         </div>
 
         <section class="mt-8 border-t pt-6">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Información del Usuario</h3>
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Información del usuario</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-600">Ciudad</label>
@@ -42,13 +41,21 @@
                     <label class="block text-sm font-medium text-gray-600">Teléfono</label>
                     <p class="mt-1 text-gray-900">{{ profile_user.user_phone }}</p>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Dirección</label>
+                    <p class="mt-1 text-gray-900">{{ profile_user.user_address }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Correo</label>
+                    <p class="mt-1 text-gray-900">{{ profile_user.email }}</p>
+                </div>
             </div>
         </section>
 
         {% if request.GET.chat_id %}
         <div class="mt-8 border-t pt-6 text-center">
             <a href="{% url 'chat_view' request.GET.chat_id %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg">
-                Volver al Chat
+                Volver al chat
             </a>
         </div>
         {% endif %}
