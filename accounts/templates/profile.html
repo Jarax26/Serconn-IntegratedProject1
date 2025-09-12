@@ -18,7 +18,6 @@
 </head>
 
 <body>
-    <!-- Navbar -->
     <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
         <h1 class="text-2xl font-bold text-gray-800">
             <a href="{% url 'service_search' %}">SERCONN</a>
@@ -38,9 +37,9 @@
                             <a href="{% url 'profile' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Perfil</a>
                         {% if user.is_service_provider %}
                             <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Agregar servicios</a>
-                            <a href="{% url 'seeker_dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
+                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
                         {% else %}
-                            <a href="{% url 'seeker_dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis solicitudes</a>
+                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis solicitudes</a>
                         {% endif %}
                         <form action="{% url 'logout' %}" method="post" style="margin:0;">
                             {% csrf_token %}
@@ -55,84 +54,87 @@
         </nav>
     </header>
 
-    <!-- Contenido Perfil -->
     <main class="max-w-3xl mx-auto mt-10 bg-white rounded-2xl shadow-lg p-8">
-    <!-- Foto de perfil -->
-    <div class="flex items-center gap-6">
-        {% if user.user_picture %}
-            <img src="{{ user.user_picture.url }}" alt="Foto de perfil" class="w-24 h-24 rounded-full object-cover">
-        {% else %}
-            <img src="{% static 'images/default_profile.png' %}" alt="Foto de perfil" class="w-24 h-24 rounded-full object-cover">
+        <div class="flex items-center gap-6">
+            {% if user.user_picture %}
+                <img src="{{ user.user_picture.url }}" alt="Foto de perfil" class="w-24 h-24 rounded-full object-cover">
+            {% else %}
+                <img src="{% static 'images/default_profile.png' %}" alt="Foto de perfil" class="w-24 h-24 rounded-full object-cover">
+            {% endif %}
+
+            <div>
+                <h2 class="text-2xl font-bold text-indigo-700">{{ user.get_full_name|default:user.username }}</h2>
+                <p class="text-gray-600">{{ user.email }}</p>
+            </div>
+        </div>
+
+        <section class="mt-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Información personal</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Nombre</label>
+                    <p class="mt-1 text-gray-900">{{ user.first_name|default:"No registrado" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Apellido</label>
+                    <p class="mt-1 text-gray-900">{{ user.last_name|default:"No registrado" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Correo</label>
+                    <p class="mt-1 text-gray-900">{{ user.email }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Teléfono</label>
+                    <p class="mt-1 text-gray-900">{{ user.user_phone|default:"No registrado" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Ciudad</label>
+                    <p class="mt-1 text-gray-900">{{ user.get_user_city_display|default:"No registrada" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Dirección</label>
+                    <p class="mt-1 text-gray-900">{{ user.user_address|default:"No registrada" }}</p>
+                </div>
+            </div>
+        </section>
+
+        {% if user.is_service_provider %}
+            <section class="mt-8">
+                <h3 class="text-xl font-semibold text-gray-800">Descripción</h3>
+                <p class="mt-2 text-gray-600">{{ user.service_provider_profile.description|default:"Aún no has añadido una descripción." }}</p>
+            </section>
+
+            <section class="mt-8">
+                <h3 class="text-xl font-semibold text-gray-800">Servicios ofrecidos</h3>
+                <ul class="mt-4 space-y-3">
+                    {% for service in user.service_provider_profile.services.all %}
+                        <li class="p-4 border rounded-lg bg-gray-50">
+                            <strong>{{ service.name }}</strong>
+                            {% if service.category %} ({{ service.category.name }}){% endif %}<br>
+                            {{ service.description }}<br>
+                            <em>Tarifa: ${{ service.rate }}</em>
+                        </li>
+                    {% empty %}
+                        <li>No has registrado servicios todavía.</li>
+                    {% endfor %}
+                </ul>
+
+                <a href="{% url 'add_service' %}" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">Agregar Servicio</a>
+            </section>
         {% endif %}
 
-        <div>
-            <h2 class="text-2xl font-bold text-indigo-700">{{ user.get_full_name|default:user.username }}</h2>
-            <p class="text-gray-600">{{ user.email }}</p>
+        <div class="flex gap-4 mt-8 border-t pt-6">
+            <a href="{% url 'edit_profile' %}" class="flex-1 text-center px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow hover:bg-gray-600">
+                Editar Información
+            </a>
+            {% if user.is_service_provider %}
+                <a href="{% url 'chat_list' %}" class="flex-1 text-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700">
+                    Ver mis Chats
+                </a>
+            {% endif %}
         </div>
-    </div>
+    </main>
 
-    <!-- Información de usuario -->
-    <section class="mt-8">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">Información personal</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-600">Nombre</label>
-                <p class="mt-1 text-gray-900">{{ user.first_name|default:"No registrado" }}</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-600">Apellido</label>
-                <p class="mt-1 text-gray-900">{{ user.last_name|default:"No registrado" }}</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-600">Correo</label>
-                <p class="mt-1 text-gray-900">{{ user.email }}</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-600">Teléfono</label>
-                <p class="mt-1 text-gray-900">{{ user.user_phone|default:"No registrado" }}</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-600">Ciudad</label>
-                <p class="mt-1 text-gray-900">{{ user.get_user_city_display|default:"No registrada" }}</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-600">Dirección</label>
-                <p class="mt-1 text-gray-900">{{ user.user_address|default:"No registrada" }}</p>
-            </div>
-        </div>
-    </section>
-
-    {% if user.is_service_provider %}
-        <section class="mt-8">
-            <h3 class="text-xl font-semibold text-gray-800">Descripción</h3>
-            <p class="mt-2 text-gray-600">{{ user.service_provider_profile.description|default:"Aún no has añadido una descripción." }}</p>
-        </section>
-
-        <section class="mt-8">
-            <h3 class="text-xl font-semibold text-gray-800">Servicios ofrecidos</h3>
-            <ul class="mt-4 space-y-3">
-                {% for service in user.service_provider_profile.services.all %}
-                    <li class="p-4 border rounded-lg bg-gray-50">
-                        <strong>{{ service.name }}</strong>
-                        {% if service.category %} ({{ service.category.name }}){% endif %}<br>
-                        {{ service.description }}<br>
-                        <em>Tarifa: ${{ service.rate }}</em>
-                    </li>
-                {% empty %}
-                    <li>No has registrado servicios todavía.</li>
-                {% endfor %}
-            </ul>
-
-            <a href="{% url 'add_service' %}" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">Agregar Servicio</a>
-        </section>
-    {% endif %}
-    <a href="{% url 'edit_profile' %}" 
-       class="mt-6 inline-block px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow hover:bg-gray-600">
-        Editar Información
-    </a>
-</main>
-
-    <!-- Script Dropdown -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const menuBtn = document.getElementById('profile-menu-btn');

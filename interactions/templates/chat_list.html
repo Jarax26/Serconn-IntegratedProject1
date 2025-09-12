@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mis Solicitudes | SERCONN</title>
+    <title>Mis Conversaciones | SERCONN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -45,69 +45,37 @@
 
     <main class="flex-grow">
         <div class="max-w-4xl mx-auto my-10 bg-white rounded-2xl shadow-lg p-8">
-            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Mis Solicitudes de Servicio</h1>
-            
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="bg-green-100 text-green-800 p-4 rounded-lg mb-4 text-center">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="p-4 font-semibold">Servicio</th>
-                            <th class="p-4 font-semibold">Proveedor</th>
-                            <th class="p-4 font-semibold">Fecha de Inicio</th>
-                            <th class="p-4 font-semibold">Estado</th>
-                            <th class="p-4 font-semibold text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in bookings %}
-                        <tr class="border-b">
-                            <td class="p-4">{{ booking.service.name }}</td>
-                            <td class="p-4">{{ booking.chat.provider.get_full_name }}</td>
-                            <td class="p-4">{{ booking.start_time|date:"d/m/Y H:i" }}</td>
-                            <td class="p-4 font-medium">
-                                <span class="px-2 py-1 text-xs rounded-full 
-                                    {% if booking.status == 'pending' %} bg-yellow-100 text-yellow-800 {% endif %}
-                                    {% if booking.status == 'confirmed' %} bg-blue-100 text-blue-800 {% endif %}
-                                    {% if booking.status == 'completed' %} bg-green-100 text-green-800 {% endif %}
-                                    {% if booking.status == 'cancelled' %} bg-red-100 text-red-800 {% endif %}">
-                                    {{ booking.get_status_display }}
-                                </span>
-                            </td>
-                            <td class="p-4 text-center">
-                                {% if booking.status == 'pending' or booking.status == 'confirmed' %}
-                                    <form action="{% url 'cancel_booking' booking.id %}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta solicitud?');">
-                                        {% csrf_token %}
-                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-full text-sm">
-                                            Cancelar
-                                        </button>
-                                    </form>
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Mis Conversaciones</h1>
+            <div class="space-y-4">
+                {% for chat in chats %}
+                    <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                {% if chat.seeker.user_picture %}
+                                    <img src="{{ chat.seeker.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
+                                {% else %}
+                                    <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ chat.seeker.get_full_name|slice:":1" }}</span>
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center text-gray-500 py-8">No tienes solicitudes de servicio.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ chat.seeker.get_full_name|default:chat.seeker.email }}</p>
+                                    <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                                </div>
+                            </div>
+                            <span class="text-indigo-600 font-semibold">Responder</span>
+                        </div>
+                    </a>
+                {% empty %}
+                    <p class="text-center text-gray-500 py-8">No tienes conversaciones activas.</p>
+                {% endfor %}
             </div>
             <div class="flex justify-end mt-8">
-                <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg">
-                    Buscar servicios
+                <a href="{% url 'profile' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                    Volver al Perfil
                 </a>
             </div>
         </div>
     </main>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuBtn = document.getElementById('profile-menu-btn');

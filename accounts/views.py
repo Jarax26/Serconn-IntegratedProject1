@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import User, ServiceProvider
 from .forms import EditProfileForm, ServiceProviderForm
+from interactions.models import Chat
+from django.shortcuts import get_object_or_404
 
 
 def register(request):
@@ -40,7 +42,7 @@ def login_view(request):
             if user.user_role == "service_seeker": # pyright: ignore[reportAttributeAccessIssue]
                 return redirect("service_search")   # Vista buscador
             elif user.user_role == "service_provider": # pyright: ignore[reportAttributeAccessIssue]
-                 return redirect("profile")  # Vista proveedor
+                    return redirect("profile")  # Vista proveedor
             else:
                 return redirect("service_search")  # fallback
         else:
@@ -104,3 +106,15 @@ def edit_profile_view(request):
         "form": user_form,
         "provider_form": provider_form
     })
+
+@login_required
+def profile_view(request):
+    chats = None
+    if request.user.is_service_provider:
+        chats = Chat.objects.filter(provider=request.user)
+    return render(request, "profile.html", {"chats": chats})
+
+@login_required
+def user_profile_view(request, user_id):
+    profile_user = get_object_or_404(User, id=user_id)
+    return render(request, 'user_profile.html', {'profile_user': profile_user})
