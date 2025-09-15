@@ -2,12 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import Http404
-
 from .models import ServiceCategory, Service
 from accounts.models import ServiceProvider
 from interactions.models import Booking # <- Importa el modelo Booking
 from .forms import ServiceForm
-
+from accounts.models import User
 
 @login_required
 def dashboard_view(request):
@@ -27,8 +26,6 @@ def dashboard_view(request):
     # Si no tiene un rol definido, lo redirige a la búsqueda
     return redirect('service_search')
 
-
-@login_required
 def service_search_view(request):
     """
     Vista principal para la búsqueda de servicios.
@@ -38,6 +35,7 @@ def service_search_view(request):
     
     query = request.GET.get('query')
     category = request.GET.get('category')
+    city = request.GET.get('city')
 
     if query:
         providers = providers.filter(
@@ -51,11 +49,16 @@ def service_search_view(request):
     if category:
         providers = providers.filter(services__category__name=category).distinct()
 
+    if city:
+        providers = providers.filter(user__user_city=city).distinct()
+
     context = {
         'categories': categories,
         'providers': providers,
         'query': query,
         'selected_category': category,
+        'selected_city': city,
+        'cities': User.CITY_CHOICES,
     }
     return render(request, 'service_search.html', context)
 
