@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Búsqueda de Servicios - SERCONN</title>
+    <title>Búsqueda de Servicios | SERCONN</title>
     <!-- Incluyendo Tailwind CSS desde su CDN para un estilo rápido y moderno -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -36,7 +36,13 @@
                         {{ user.get_full_name|default:user.username }}
                     </button>
                     <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg hidden z-50">
-                            <a href="{% url 'profile' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Perfil</a>
+                        <a href="{% url 'profile' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Perfil</a>
+                        <a href="{% url 'notification_list' %}" class="flex justify-between items-center px-4 py-2 hover:bg-indigo-50 text-gray-700">
+                            <span>Notificaciones</span>
+                            {% if unread_notifications > 0 %}
+                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">{{ unread_notifications }}</span>
+                            {% endif %}
+                        </a>
                         {% if user.is_service_provider %}
                             <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Agregar servicios</a>
                             <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
@@ -77,7 +83,7 @@
         </div>
         {% endif %}
         <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-2xl mx-auto">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Encuentra el Servicio que Necesitas</h2>
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Encuentra el servicio que necesitas</h2>
             <form action="{% url 'service_search' %}" method="get" class="space-y-4">
                 <div class="flex flex-col md:flex-row gap-4">
                     <!-- Campo de búsqueda por palabra clave (FR-3) -->
@@ -101,7 +107,7 @@
         </div>
 
         <section class="mt-12">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Resultados de Búsqueda</h2>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Resultados de búsqueda</h2>
             {% if providers %}
                 <ul class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for provider in providers %}

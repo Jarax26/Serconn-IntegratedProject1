@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mis Conversaciones | SERCONN</title>
+    <title>Notificaciones | SERCONN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -21,7 +21,7 @@
                         {% if user.user_picture %}
                             <img src="{{ user.user_picture.url }}" alt="Perfil" class="w-8 h-8 rounded-full object-cover">
                         {% else %}
-                            <span class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center font-bold">{{ user.get_full_name|slice:":1" }}</span>
+                            <span class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center font-bold">{{ user.username|slice:":1" }}</span>
                         {% endif %}
                         {{ user.get_full_name|default:user.username }}
                     </button>
@@ -50,38 +50,34 @@
     </header>
 
     <main class="flex-grow">
-        <div class="max-w-4xl mx-auto my-10 bg-white rounded-2xl shadow-lg p-8">
-            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Mis conversaciones</h1>
+        <div class="max-w-2xl mx-auto my-10 bg-white rounded-2xl shadow-lg p-8">
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Mis notificaciones</h1>
             <div class="space-y-4">
-                {% for chat in chats %}
-                    <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-4">
-                                {% if chat.seeker.user_picture %}
-                                    <img src="{{ chat.seeker.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
-                                {% else %}
-                                    <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ chat.seeker.get_full_name|slice:":1" }}</span>
-                                {% endif %}
-                                <div>
-                                    <p class="font-semibold text-gray-800">{{ chat.seeker.get_full_name|default:chat.seeker.email }}</p>
-                                    <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
-                                </div>
-                            </div>
-                            <span class="text-indigo-600 font-semibold">Responder</span>
-                        </div>
-                    </a>
+                {% for notification in notifications %}
+                    <div class="p-4 border rounded-lg {% if not notification.is_read %} bg-indigo-50 border-indigo-200 {% else %} bg-gray-50 {% endif %}">
+                        <p class="text-gray-800">{{ notification.message }}</p>
+                        <span class="text-xs text-gray-500 block text-right mt-1">{{ notification.created_at|date:"d/m/Y H:i A" }}</span>
+                    </div>
                 {% empty %}
-                    <p class="text-center text-gray-500 py-8">No tienes conversaciones activas.</p>
+                    <p class="text-center text-gray-500 py-8">No tienes notificaciones.</p>
                 {% endfor %}
             </div>
-            <div class="flex justify-end mt-8">
-                <a href="{% url 'profile' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full shadow-lg">
-                    Volver al perfil
-                </a>
-            </div>
+            {% if user.is_service_provider %}
+                <div class="flex justify-end mt-8">
+                    <a href="{% url 'profile' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                        Volver al perfil
+                    </a>
+                </div>
+            {% endif %}
+            {% if user.is_service_seeker %}
+                <div class="flex justify-end mt-8">
+                    <a href="{% url 'service_search' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                        Volver al inicio
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </main>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuBtn = document.getElementById('profile-menu-btn');
