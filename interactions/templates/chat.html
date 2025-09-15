@@ -58,7 +58,7 @@
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border mb-4">
                 {% if user.is_service_seeker %}
                     {% with other_user=chat.provider %}
-                    <a href="{% url 'provider_detail' other_user.service_provider_profile.id %}" class="flex items-center gap-4">
+                    <a href="{% url 'user_profile' other_user.id %}?chat_id={{ chat.id }}" class="flex items-center gap-4">
                         {% if other_user.user_picture %}
                             <img src="{{ other_user.user_picture.url }}" alt="Perfil" class="w-12 h-12 rounded-full object-cover">
                         {% else %}
