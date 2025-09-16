@@ -17,9 +17,15 @@
 </head>
 <body class="flex flex-col min-h-screen">
     <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
-        <h1 class="text-2xl font-bold text-gray-800">
-            <a href="{% url 'service_search' %}">SERCONN</a>
-        </h1>
+        {% if user.is_service_provider %}
+            <h1 class="text-2xl font-bold text-gray-800">
+                <a href="{% url 'profile' %}">SERCONN</a>
+            </h1>
+        {% else %}
+            <h1 class="text-2xl font-bold text-gray-800">
+                <a href="{% url 'service_search' %}">SERCONN</a>
+            </h1>
+        {% endif %}
         <nav>
             {% if user.is_authenticated %}
                 <div class="relative">
@@ -51,9 +57,6 @@
                         </form>
                     </div>
                 </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="text-indigo-600 hover:text-indigo-800 font-semibold px-4 py-2">Iniciar sesión</a>
-                <a href="{% url 'register' %}" class="text-indigo-600 hover:text-indigo-800 font-semibold px-4 py-2">Registrarse</a>
             {% endif %}
         </nav>
     </header>

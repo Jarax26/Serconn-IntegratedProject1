@@ -15,9 +15,15 @@
 </head>
 <body class="flex flex-col min-h-screen">
     <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
-        <h1 class="text-2xl font-bold text-gray-800">
-            <a href="{% url 'service_search' %}">SERCONN</a>
-        </h1>
+        {% if user.is_service_provider %}
+            <h1 class="text-2xl font-bold text-gray-800">
+                <a href="{% url 'profile' %}">SERCONN</a>
+            </h1>
+        {% else %}
+            <h1 class="text-2xl font-bold text-gray-800">
+                <a href="{% url 'service_search' %}">SERCONN</a>
+            </h1>
+        {% endif %}
         <nav>
             {% if user.is_authenticated %}
                 <div class="relative">
@@ -25,7 +31,7 @@
                         {% if user.user_picture %}
                             <img src="{{ user.user_picture.url }}" alt="Perfil" class="w-8 h-8 rounded-full object-cover">
                         {% else %}
-                            <span class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center font-bold">{{ user.get_full_name|slice:":1" }}</span>
+                            <span class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center font-bold">{{ user.username|slice:":1" }}</span>
                         {% endif %}
                         {{ user.get_full_name|default:user.username }}
                     </button>
