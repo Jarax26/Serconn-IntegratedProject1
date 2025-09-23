@@ -18,8 +18,8 @@ class User(AbstractUser):
 
     # Choices for user roles
     ROLE_CHOICES = (
-        ('service_seeker', 'Service Seeker'),
-        ('service_provider', 'Service Provider'),
+        ('service_seeker', 'Cliente'),
+        ('service_provider', 'Proveedor'),
     )
     user_role = models.CharField(max_length=20, choices=ROLE_CHOICES)
 

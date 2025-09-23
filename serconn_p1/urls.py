@@ -17,8 +17,8 @@ urlpatterns = [
     # Apps
     path("accounts/", include("accounts.urls")),   # manejo de cuentas
     path("search/", include("searching.urls")),   # búsqueda de servicios
+    path("interactions/", include("interactions.urls")), # <--- AÑADIR ESTA LÍNEA
     # path("payments/", include("payments.urls")),
-    # path("interactions/", include("interactions.urls")),
 
     # Autenticación
     path("", accountViews.login_view, name="login"),
@@ -27,7 +27,8 @@ urlpatterns = [
 
     # Vistas de servicios
     path("provider/<int:provider_id>/", appViews.provider_detail_view, name="provider_detail"),
-    path("dashboard/", appViews.seeker_dashboard, name="seeker_dashboard"),
+    # Cambia la siguiente línea
+    path("dashboard/", appViews.dashboard_view, name="dashboard"),
 ]
 
 # Archivos multimedia en desarrollo
