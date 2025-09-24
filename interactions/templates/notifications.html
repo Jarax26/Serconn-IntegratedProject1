@@ -2,15 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ provider.user.get_full_name }} | Perfil | SERCONN</title>
+    <title>Notificaciones | SERCONN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f7f9fb;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f7f9fb; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -59,52 +55,52 @@
         </nav>
     </header>
 
-    <main class="container mx-auto px-4 py-8 md:py-12 flex-grow">
-        <div class="bg-white p-6 md:p-10 rounded-2xl shadow-xl max-w-4xl mx-auto">
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-8 border-b pb-8 mb-8">
-                {% if provider.user.user_picture %}
-                    <img src="{{ provider.user.user_picture.url }}" alt="Foto de perfil de {{ provider.user.username }}" class="w-32 h-32 rounded-full object-cover flex-shrink-0">
-                {% else %}
-                    <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-5xl font-bold flex-shrink-0">
-                        {{ provider.user.first_name|slice:":1" }}
+    <main class="flex-grow">
+        <div class="max-w-2xl mx-auto my-10 bg-white rounded-2xl shadow-lg p-8">
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Mis notificaciones</h1>
+            <div class="space-y-4">
+                {% for notification in notifications %}
+                    <div class="p-4 border rounded-lg {% if not notification.is_read %} bg-indigo-50 border-indigo-200 {% else %} bg-gray-50 {% endif %}">
+                        <p class="text-gray-800">{{ notification.message }}</p>
+                        <span class="text-xs text-gray-500 block text-right mt-1">{{ notification.created_at|date:"d/m/Y H:i A" }}</span>
                     </div>
-                {% endif %}
-                <div class="text-center md:text-left">
-                    <h1 class="text-4xl font-bold text-gray-800">{{ provider.user.get_full_name|default:provider.user.username }}</h1>
-                    <p class="text-gray-600 font-bold">Score: {{ provider.user.user_score }} ⭐</p>
-                    <p class="mt-2 text-xl text-gray-600">{{ provider.user.service_provider_profile.description|default:"Sin descripción" }}</p>
-                    
-                    {% if user.is_authenticated and user.is_service_seeker %}
-                        <div class="mt-6">
-                            <a href="{% url 'create_or_find_chat' provider.user.id %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">
-                                Iniciar chat
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
+                {% empty %}
+                    <p class="text-center text-gray-500 py-8">No tienes notificaciones.</p>
+                {% endfor %}
             </div>
-
-            <section>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Servicios y precios</h2>
-                {% if services_offered %}
-                    <ul class="grid md:grid-cols-2 gap-6">
-                        {% for service in services_offered %}
-                            <li class="bg-gray-50 p-6 rounded-2xl shadow-inner border border-gray-100 flex flex-col justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-lg text-indigo-600">{{ service.name }}</h3>
-                                    <p class="text-gray-600 mt-2">{{ service.description }}</p>
-                                    <p class="mt-4 text-gray-700">Costo: <span class="text-2xl font-bold text-indigo-700">${{ service.rate|floatformat:0 }}</span></p>
-                                </div>
-                                </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <div class="text-center text-gray-500 p-8 bg-gray-50 rounded-2xl shadow-inner">
-                        <p class="text-lg">Este proveedor aún no ha listado sus servicios.</p>
-                    </div>
-                {% endif %}
-            </section>
+            {% if user.is_service_provider %}
+                <div class="flex justify-end mt-8">
+                    <a href="{% url 'profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                        Volver al perfil
+                    </a>
+                </div>
+            {% endif %}
+            {% if user.is_service_seeker %}
+                <div class="flex justify-end mt-8">
+                    <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                        Volver al inicio
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('profile-menu-btn');
+            const dropdown = document.getElementById('profile-dropdown');
+            if (menuBtn && dropdown) {
+                menuBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!dropdown.classList.contains('hidden')) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+                dropdown.addEventListener('click', (e) => e.stopPropagation());
+            }
+        });
+    </script>
 </body>
 </html>

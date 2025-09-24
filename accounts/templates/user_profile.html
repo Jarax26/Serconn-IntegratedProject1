@@ -1,16 +1,13 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ provider.user.get_full_name }} | Perfil | SERCONN</title>
+    <title>Perfil de {{ profile_user.get_full_name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f7f9fb;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f7f9fb; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -59,52 +56,68 @@
         </nav>
     </header>
 
-    <main class="container mx-auto px-4 py-8 md:py-12 flex-grow">
-        <div class="bg-white p-6 md:p-10 rounded-2xl shadow-xl max-w-4xl mx-auto">
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-8 border-b pb-8 mb-8">
-                {% if provider.user.user_picture %}
-                    <img src="{{ provider.user.user_picture.url }}" alt="Foto de perfil de {{ provider.user.username }}" class="w-32 h-32 rounded-full object-cover flex-shrink-0">
-                {% else %}
-                    <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-5xl font-bold flex-shrink-0">
-                        {{ provider.user.first_name|slice:":1" }}
-                    </div>
-                {% endif %}
-                <div class="text-center md:text-left">
-                    <h1 class="text-4xl font-bold text-gray-800">{{ provider.user.get_full_name|default:provider.user.username }}</h1>
-                    <p class="text-gray-600 font-bold">Score: {{ provider.user.user_score }} ⭐</p>
-                    <p class="mt-2 text-xl text-gray-600">{{ provider.user.service_provider_profile.description|default:"Sin descripción" }}</p>
-                    
-                    {% if user.is_authenticated and user.is_service_seeker %}
-                        <div class="mt-6">
-                            <a href="{% url 'create_or_find_chat' provider.user.id %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">
-                                Iniciar chat
-                            </a>
-                        </div>
-                    {% endif %}
+    <main class="max-w-3xl mx-auto mt-10 bg-white rounded-2xl shadow-lg p-8">
+        <div class="flex items-center gap-6">
+            {% if profile_user.user_picture %}
+                <img src="{{ profile_user.user_picture.url }}" alt="Foto de perfil" class="w-24 h-24 rounded-full object-cover">
+            {% else %}
+                <div class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center font-bold text-3xl">{{ profile_user.get_full_name|slice:":1" }}</div>
+            {% endif %}
+            <div>
+                <h2 class="text-2xl font-bold text-indigo-700">{{ profile_user.get_full_name }}</h2>
+                <p class="mt-1 px-3 py-1 text-sm inline-block rounded-full {% if profile_user.is_service_provider %} bg-yellow-100 text-yellow-800 {% else %} bg-green-100 text-green-800 {% endif %}">
+                    {{ profile_user.get_user_role_display }}
+                </p>
+            </div>
+        </div>
+
+        <section class="mt-8 border-t pt-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Información del usuario</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Ciudad</label>
+                    <p class="mt-1 text-gray-900">{{ profile_user.get_user_city_display }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Teléfono</label>
+                    <p class="mt-1 text-gray-900">{{ profile_user.user_phone }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Dirección</label>
+                    <p class="mt-1 text-gray-900">{{ profile_user.user_address }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Correo</label>
+                    <p class="mt-1 text-gray-900">{{ profile_user.email }}</p>
                 </div>
             </div>
+        </section>
 
-            <section>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Servicios y precios</h2>
-                {% if services_offered %}
-                    <ul class="grid md:grid-cols-2 gap-6">
-                        {% for service in services_offered %}
-                            <li class="bg-gray-50 p-6 rounded-2xl shadow-inner border border-gray-100 flex flex-col justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-lg text-indigo-600">{{ service.name }}</h3>
-                                    <p class="text-gray-600 mt-2">{{ service.description }}</p>
-                                    <p class="mt-4 text-gray-700">Costo: <span class="text-2xl font-bold text-indigo-700">${{ service.rate|floatformat:0 }}</span></p>
-                                </div>
-                                </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <div class="text-center text-gray-500 p-8 bg-gray-50 rounded-2xl shadow-inner">
-                        <p class="text-lg">Este proveedor aún no ha listado sus servicios.</p>
-                    </div>
-                {% endif %}
-            </section>
+        {% if request.GET.chat_id %}
+        <div class="mt-8 border-t pt-6 text-center">
+            <a href="{% url 'chat_view' request.GET.chat_id %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg">
+                Volver al chat
+            </a>
         </div>
+        {% endif %}
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('profile-menu-btn');
+            const dropdown = document.getElementById('profile-dropdown');
+            if (menuBtn && dropdown) {
+                menuBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!dropdown.classList.contains('hidden')) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+                dropdown.addEventListener('click', (e) => e.stopPropagation());
+            }
+        });
+    </script>
 </body>
 </html>

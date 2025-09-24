@@ -73,6 +73,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "interactions.context_processors.unread_notifications_count",
             ],
         },
     },
@@ -133,3 +134,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Configuración de Correo Electrónico para Desarrollo
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

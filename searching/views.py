@@ -1,26 +1,41 @@
-from django.shortcuts import render, redirect
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import ServiceCategory, Service
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import Http404
-from django.contrib.auth.decorators import login_required
-from .models import ServiceRequest
+from .models import ServiceCategory, Service
 from accounts.models import ServiceProvider
+from interactions.models import Booking # <- Importa el modelo Booking
 from .forms import ServiceForm
-
+from accounts.models import User
 
 @login_required
+def dashboard_view(request):
+    """
+    Muestra el dashboard correspondiente según el rol del usuario.
+    """
+    if request.user.is_service_seeker:
+        # Busca las reservas donde el usuario es el solicitante
+        bookings = Booking.objects.filter(chat__seeker=request.user).order_by('-start_time')
+        return render(request, 'seeker_dashboard.html', {'bookings': bookings})
+    
+    elif request.user.is_service_provider:
+        # Busca las reservas donde el usuario es el proveedor
+        bookings = Booking.objects.filter(chat__provider=request.user).order_by('-start_time')
+        return render(request, 'provider_dashboard.html', {'bookings': bookings})
+
+    # Si no tiene un rol definido, lo redirige a la búsqueda
+    return redirect('service_search')
+
 def service_search_view(request):
     """
     Vista principal para la búsqueda de servicios.
     """
     categories = ServiceCategory.objects.all()
-    
-    # Solo proveedores con al menos un servicio
     providers = ServiceProvider.objects.select_related("user").filter(services__isnull=False).distinct()
     
     query = request.GET.get('query')
     category = request.GET.get('category')
+    city = request.GET.get('city')
 
     if query:
         providers = providers.filter(
@@ -34,11 +49,16 @@ def service_search_view(request):
     if category:
         providers = providers.filter(services__category__name=category).distinct()
 
+    if city:
+        providers = providers.filter(user__user_city=city).distinct()
+
     context = {
         'categories': categories,
         'providers': providers,
         'query': query,
         'selected_category': category,
+        'selected_city': city,
+        'cities': User.CITY_CHOICES,
     }
     return render(request, 'service_search.html', context)
 
@@ -47,12 +67,10 @@ def provider_detail_view(request, provider_id):
     """
     Vista para mostrar el perfil detallado de un proveedor.
     """
-
     try:
         provider = get_object_or_404(ServiceProvider, pk=provider_id)
     except Http404:
         return render(request, '404.html')
-
 
     services_offered = Service.objects.filter(provider=provider)
 
@@ -61,11 +79,6 @@ def provider_detail_view(request, provider_id):
         'services_offered': services_offered,
     }
     return render(request, 'provider_detail.html', context)
-
-@login_required
-def seeker_dashboard(request):
-    service_requests = ServiceRequest.objects.filter(seeker=request.user)
-    return render(request, 'seeker_dashboard.html', {'service_requests': service_requests})
 
 @login_required
 def add_service(request):
