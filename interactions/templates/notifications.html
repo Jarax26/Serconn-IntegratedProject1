@@ -77,10 +77,13 @@
             {% endif %}
             {% if user.is_service_seeker %}
                 <div class="flex justify-end mt-8">
-                    <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg">
-                        Volver al inicio
-                    </a>
-                </div>
+                <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg m-2">
+                    Volver al inicio
+                </a>
+                <a href="{% url 'profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg m-2">
+                    Ir a mi perfil
+                </a>
+            </div>
             {% endif %}
         </div>
     </main>

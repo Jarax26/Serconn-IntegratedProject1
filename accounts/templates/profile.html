@@ -146,13 +146,15 @@
             <a href="{% url 'notification_list' %}" class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">
                 Notificaciones
             </a>
-            {% if user.is_service_provider %}
-                <a href="{% url 'chat_list' %}" class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">
-                    Chats
-                </a>
-            {% endif %}
+            <a href="{% url 'chat_list' %}" class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">
+                Chats
+            </a>
             <a href="{% url 'dashboard' %}" class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">
+                {% if user.is_service_provider %}
                     Mis servicios
+                {% else %}
+                    Mis solicitudes
+                {% endif %}
             </a>
         </div>
     </main>

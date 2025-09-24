@@ -113,16 +113,23 @@
             </div>
 
             <div class="mt-6 flex gap-3 items-center border-t pt-6">
-                <form action="{% url 'send_message' chat.id %}" method="post" class="flex-grow flex gap-3 items-center">
+                <form id="message-form" action="{% url 'send_message' chat.id %}" method="post" class="flex-grow flex gap-3 items-center">
                     {% csrf_token %}
                     <textarea name="content" required class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Escribe tu mensaje..." rows="1"></textarea>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-lg">Enviar</button>
+                    <button id="send-message-btn" type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-lg">Enviar</button>
                 </form>
                 
                 {% if user.is_service_seeker %}
                 <button id="booking-modal-btn" type="button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg">Solicitar</button>
                 {% endif %}
             </div>
+            
+            <div class="text-center mt-6">
+                <a href="{% url 'profile' %}" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-5 rounded-full shadow-lg transition-colors duration-300">
+                    ← Volver a mi Perfil
+                </a>
+            </div>
+
         </div>
     </main>
 
@@ -152,6 +159,7 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- Código existente para el menú y el modal ---
         const menuBtn = document.getElementById('profile-menu-btn');
         const dropdown = document.getElementById('profile-dropdown');
         if (menuBtn && dropdown) {
@@ -184,6 +192,17 @@
                 }
             });
         }
+        
+        const messageForm = document.getElementById('message-form');
+        const messageInput = messageForm.querySelector("textarea[name='content']");
+        const sendButton = document.getElementById('send-message-btn');
+
+        messageInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendButton.click();
+            }
+        });
     });
     </script>
 </body>

@@ -60,31 +60,61 @@
             <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Mis conversaciones</h1>
             <div class="space-y-4">
                 {% for chat in chats %}
-                    <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-4">
-                                {% if chat.seeker.user_picture %}
-                                    <img src="{{ chat.seeker.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
-                                {% else %}
-                                    <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ chat.seeker.get_full_name|slice:":1" }}</span>
-                                {% endif %}
-                                <div>
-                                    <p class="font-semibold text-gray-800">{{ chat.seeker.get_full_name|default:chat.seeker.email }}</p>
-                                    <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                    {% comment %} Determine who the 'other user' in the chat is {% endcomment %}
+                    {% if request.user == chat.seeker %}
+                        {% with other_user=chat.provider %}
+                            <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-4">
+                                        {% if other_user.user_picture %}
+                                            <img src="{{ other_user.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
+                                        {% else %}
+                                            <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ other_user.get_full_name|slice:":1" }}</span>
+                                        {% endif %}
+                                        <div>
+                                            <p class="font-semibold text-gray-800">{{ other_user.get_full_name|default:other_user.email }}</p>
+                                            <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-indigo-600 font-semibold">Responder</span>
                                 </div>
-                            </div>
-                            <span class="text-indigo-600 font-semibold">Responder</span>
-                        </div>
-                    </a>
+                            </a>
+                        {% endwith %}
+                    {% else %}
+                        {% with other_user=chat.seeker %}
+                            <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-4">
+                                        {% if other_user.user_picture %}
+                                            <img src="{{ other_user.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
+                                        {% else %}
+                                            <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ other_user.get_full_name|slice:":1" }}</span>
+                                        {% endif %}
+                                        <div>
+                                            <p class="font-semibold text-gray-800">{{ other_user.get_full_name|default:other_user.email }}</p>
+                                            <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-indigo-600 font-semibold">Responder</span>
+                                </div>
+                            </a>
+                        {% endwith %}
+                    {% endif %}
                 {% empty %}
                     <p class="text-center text-gray-500 py-8">No tienes conversaciones activas.</p>
                 {% endfor %}
             </div>
             <div class="flex justify-end mt-8">
-                <a href="{% url 'profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg">
-                    Volver al perfil
+                {% if user.is_service_seeker %}
+                    <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg m-2">
+                            Ir al inicio
+                    </a>
+                {% endif %}
+                <a href="{% url 'profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg m-2">
+                    Volver a mi perfil
                 </a>
             </div>
+            
         </div>
     </main>
 
