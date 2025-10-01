@@ -19,13 +19,19 @@
 
 <body>
     <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
-        {% if user.is_service_provider %}
-            <h1 class="text-2xl font-bold text-gray-800">
-                <a href="{% url 'profile' %}">SERCONN</a>
-            </h1>
+        {% if user.is_authenticated %}
+            {% if user.is_service_provider %}
+                <h1 class="text-2xl font-bold text-gray-800">
+                    <a href="{% url 'profile' %}">SERCONN</a>
+                </h1>
+            {% else %}
+                <h1 class="text-2xl font-bold text-gray-800">
+                    <a href="{% url 'service_search' %}">SERCONN</a>
+                </h1>
+            {% endif %}
         {% else %}
             <h1 class="text-2xl font-bold text-gray-800">
-                <a href="{% url 'service_search' %}">SERCONN</a>
+                <a href="{% url 'login' %}">SERCONN</a>
             </h1>
         {% endif %}
         <nav>
@@ -41,18 +47,13 @@
                     </button>
                     <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg hidden z-50">
                         <a href="{% url 'profile' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Perfil</a>
-                        <a href="{% url 'notification_list' %}" class="flex justify-between items-center px-4 py-2 hover:bg-indigo-50 text-gray-700">
-                            <span>Notificaciones</span>
-                            {% if unread_notifications > 0 %}
-                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">{{ unread_notifications }}</span>
-                            {% endif %}
-                        </a>
+                        <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
                         {% if user.is_service_provider %}
-                            <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Agregar servicios</a>
-                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
-                        {% else %}
-                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis solicitudes</a>
+                            <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Añadir servicio</a>
+                            <a href="{% url 'availability' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Disponibilidad</a>
                         {% endif %}
+                        <a href="{% url 'notification_list' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Notificaciones</a>
+                        <a href="{% url 'chat_list' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Chats</a>
                         <form action="{% url 'logout' %}" method="post" style="margin:0;">
                             {% csrf_token %}
                             <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-indigo-50 text-gray-700">Cerrar sesión</button>
@@ -62,7 +63,6 @@
             {% endif %}
         </nav>
     </header>
-
     <main class="max-w-3xl mx-auto mt-10 bg-white rounded-2xl shadow-lg p-8">
         <div class="flex items-center gap-6">
             {% if user.user_picture %}
@@ -76,6 +76,9 @@
                 <p class="mt-1 px-3 py-1 text-sm inline-block rounded-full {% if user.is_service_provider %} bg-yellow-100 text-yellow-800 {% else %} bg-green-100 text-green-800 {% endif %}">
                     {{ user.get_user_role_display }}
                 </p>
+            </div>
+            <div class="ml-auto">
+                <a href="{% url 'edit_profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full shadow font-semibold transition-colors">Editar perfil</a>
             </div>
         </div>
 
@@ -139,23 +142,21 @@
             </section>
         {% endif %}
 
-        <div class="flex flex-wrap gap-4 mt-8 border-t pt-6">
-            <a href="{% url 'edit_profile' %}" class="flex-1 text-center px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow hover:bg-gray-600">
-                Editar perfil
-            </a>
-            <a href="{% url 'notification_list' %}" class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">
+        <div class="flex flex-wrap justify-center gap-4 mt-8 border-t pt-6">
+            <a href="{% url 'notification_list' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700">
                 Notificaciones
             </a>
-            <a href="{% url 'chat_list' %}" class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">
+            <a href="{% url 'chat_list' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700">
                 Chats
             </a>
-            <a href="{% url 'dashboard' %}" class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">
-                {% if user.is_service_provider %}
-                    Mis servicios
-                {% else %}
-                    Mis solicitudes
-                {% endif %}
+            <a href="{% url 'dashboard' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700">
+                Solicitudes
             </a>
+            {% if user.is_service_provider %}
+                <a href="{% url 'availability' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700">
+                    Disponibilidad
+                </a>
+            {% endif %}
         </div>
     </main>
 

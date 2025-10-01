@@ -4,9 +4,10 @@ from django.db.models import Q
 from django.http import Http404
 from .models import ServiceCategory, Service
 from accounts.models import ServiceProvider
-from interactions.models import Booking # <- Importa el modelo Booking
+from interactions.models import Booking
 from .forms import ServiceForm
 from accounts.models import User
+from datetime import datetime
 
 @login_required
 def dashboard_view(request):
@@ -36,6 +37,8 @@ def service_search_view(request):
     query = request.GET.get('query')
     category = request.GET.get('category')
     city = request.GET.get('city')
+    availability_start_str = request.GET.get('availability_start')
+    availability_end_str = request.GET.get('availability_end')
 
     if query:
         providers = providers.filter(
@@ -52,6 +55,21 @@ def service_search_view(request):
     if city:
         providers = providers.filter(user__user_city=city).distinct()
 
+    if availability_start_str and availability_end_str:
+        try:
+            availability_start = datetime.fromisoformat(availability_start_str)
+            availability_end = datetime.fromisoformat(availability_end_str)
+
+            # Lógica de filtro corregida: Busca proveedores cuya disponibilidad
+            # contenga completamente el rango de tiempo solicitado.
+            providers = providers.filter(
+                availability__start_time__lte=availability_start,
+                availability__end_time__gte=availability_end
+            ).distinct()
+        except (ValueError, TypeError):
+            # Ignorar si el formato de fecha es inválido
+            pass
+
     context = {
         'categories': categories,
         'providers': providers,
@@ -59,6 +77,8 @@ def service_search_view(request):
         'selected_category': category,
         'selected_city': city,
         'cities': User.CITY_CHOICES,
+        'availability_start': availability_start_str,
+        'availability_end': availability_end_str,
     }
     return render(request, 'service_search.html', context)
 

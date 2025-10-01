@@ -11,19 +11,25 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f7f9fb; /* Un fondo claro y suave */
+            background-color: #f7f9fb;
         }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
     <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
-        {% if user.is_service_provider %}
-            <h1 class="text-2xl font-bold text-gray-800">
-                <a href="{% url 'profile' %}">SERCONN</a>
-            </h1>
+        {% if user.is_authenticated %}
+            {% if user.is_service_provider %}
+                <h1 class="text-2xl font-bold text-gray-800">
+                    <a href="{% url 'profile' %}">SERCONN</a>
+                </h1>
+            {% else %}
+                <h1 class="text-2xl font-bold text-gray-800">
+                    <a href="{% url 'service_search' %}">SERCONN</a>
+                </h1>
+            {% endif %}
         {% else %}
             <h1 class="text-2xl font-bold text-gray-800">
-                <a href="{% url 'service_search' %}">SERCONN</a>
+                <a href="{% url 'login' %}">SERCONN</a>
             </h1>
         {% endif %}
         <nav>
@@ -39,18 +45,13 @@
                     </button>
                     <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg hidden z-50">
                         <a href="{% url 'profile' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Perfil</a>
-                        <a href="{% url 'notification_list' %}" class="flex justify-between items-center px-4 py-2 hover:bg-indigo-50 text-gray-700">
-                            <span>Notificaciones</span>
-                            {% if unread_notifications > 0 %}
-                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">{{ unread_notifications }}</span>
-                            {% endif %}
-                        </a>
+                        <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
                         {% if user.is_service_provider %}
-                            <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Agregar servicios</a>
-                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
-                        {% else %}
-                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis solicitudes</a>
+                            <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Añadir servicio</a>
+                            <a href="{% url 'availability' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Disponibilidad</a>
                         {% endif %}
+                        <a href="{% url 'notification_list' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Notificaciones</a>
+                        <a href="{% url 'chat_list' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Chats</a>
                         <form action="{% url 'logout' %}" method="post" style="margin:0;">
                             {% csrf_token %}
                             <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-indigo-50 text-gray-700">Cerrar sesión</button>
@@ -60,11 +61,10 @@
             {% endif %}
         </nav>
     </header>
-
     <main class="container mx-auto px-4 py-8 md:py-12 flex-grow">
 
         {% if user.is_authenticated and user.is_service_seeker %}
-        <div class="max-w-md mx-auto mt-8 bg-white rounded-2xl shadow-lg p-6 flex items-center gap-6">
+        <div class="max-w-md mx-auto my-8 bg-white rounded-2xl shadow-lg p-6 flex items-center gap-6">
             {% if user.user_picture %}
             <img src="{{ user.user_picture.url }}" alt="Foto de perfil"
                 class="w-20 h-20 rounded-full object-cover">
@@ -76,36 +76,61 @@
             <div>
                 <h3 class="text-xl font-bold text-indigo-700">{{ user.get_full_name|default:user.username }}</h3>
                 <p class="text-gray-600"> Score: {{ user.user_score }} ⭐</p>
-                <a href="{% url 'dashboard' %}" class="text-indigo-600 hover:underline font-semibold block mt-2">Ver mis
-                    solicitudes</a>
+                <a href="{% url 'dashboard' %}" class="text-indigo-600 hover:underline font-semibold block mt-2">Ver mis solicitudes</a>
             </div>
         </div>
         {% endif %}
+        
         <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-4xl mx-auto">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Encuentra el servicio que necesitas</h2>
+            
             <form action="{% url 'service_search' %}" method="get" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <div class="flex items-center gap-4">
                     <input type="text" name="query" placeholder="Ej: Plomero, Tutor de inglés..." value="{{ query|default:'' }}" 
-                            class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
-                    
-                    <select name="category" class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
-                        <option value="">Todas las categorías</option>
-                        {% for category in categories %}
-                            <option value="{{ category.name }}" {% if category.name == selected_category %}selected{% endif %}>
-                                {{ category.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    
-                    <select name="city" class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
-                        <option value="">Todas las ciudades</option>
-                        {% for city_value, city_name in cities %}
-                            <option value="{{ city_value }}" {% if city_value == selected_city %}selected{% endif %}>
-                                {{ city_name }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                        class="flex-grow p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                    <button type="button" id="filter-toggle-btn" class="flex-shrink-0 px-6 py-3 bg-gray-100 text-gray-800 font-semibold rounded-full shadow-sm hover:bg-gray-200 transition">
+                        Filtrar búsqueda
+                    </button>
                 </div>
+
+                <div id="filter-container" class="hidden border-t pt-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700 text-center mb-1">Categoría</label>
+                            <select id="category" name="category" class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                                <option value="">Todas las categorías</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.name }}" {% if category.name == selected_category %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-gray-700 text-center mb-1">Ciudad</label>
+                            <select id="city" name="city" class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                                <option value="">Todas las ciudades</option>
+                                {% for city_value, city_name in cities %}
+                                    <option value="{{ city_value }}" {% if city_value == selected_city %}selected{% endif %}>
+                                        {{ city_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="availability_start" class="block text-sm font-medium text-gray-700 text-center mb-1">Disponible desde</label>
+                            <input type="datetime-local" id="availability_start" name="availability_start" value="{{ availability_start|default:'' }}"
+                                class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                        </div>
+                        <div>
+                            <label for="availability_end" class="block text-sm font-medium text-gray-700 text-center mb-1">Disponible hasta</label>
+                            <input type="datetime-local" id="availability_end" name="availability_end" value="{{ availability_end|default:'' }}"
+                                class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-full transition-colors duration-300 shadow-lg">
                     Buscar
                 </button>
@@ -160,12 +185,11 @@
             {% endif %}
         </section>
 
-
-
     </main>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Menú desplegable del perfil
         const menuBtn = document.getElementById('profile-menu-btn');
         const dropdown = document.getElementById('profile-dropdown');
 
@@ -183,6 +207,16 @@
 
             dropdown.addEventListener('click', function(e) {
                 e.stopPropagation();
+            });
+        }
+
+        // Menú desplegable de filtros
+        const filterToggleBtn = document.getElementById('filter-toggle-btn');
+        const filterContainer = document.getElementById('filter-container');
+
+        if (filterToggleBtn && filterContainer) {
+            filterToggleBtn.addEventListener('click', function() {
+                filterContainer.classList.toggle('hidden');
             });
         }
     });
