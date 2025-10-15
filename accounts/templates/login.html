@@ -1,61 +1,56 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Inicia sesión | SERCONN</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; background-color: #f7f9fb; }
-    </style>
-</head>
-<body class="flex flex-col min-h-screen">
+{% extends 'base.html' %} 
 
-    <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
-        <h1 class="text-2xl font-bold text-gray-800">
-            <a href="{% url 'login' %}">SERCONN</a>
-        </h1>
-    </header>
+{% block title %}Inicia sesión | SERCONN{% endblock %}
 
-    <main class="flex-grow flex items-center justify-center px-4">
-        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
-                Inicia sesión
-            </h2>
+{% block content %}
+<div class="flex items-center justify-center px-4 py-12">
+    <div class="bg-white p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+        <h2 class="text-3xl font-bold text-center text-brand-text mb-6">
+            Bienvenido de nuevo
+        </h2>
 
-            <form method="post" class="space-y-6">
-                {% csrf_token %}
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Correo electrónico</label>
-                    <input type="email" name="email" required 
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            <div>
+                <label for="email" class="block text-brand-text font-semibold mb-2">Correo electrónico</label>
+                <input type="email" id="email" name="email" required 
+                       class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition">
+            </div>
+            <div>
+                <label for="password" class="block text-brand-text font-semibold mb-2">Contraseña</label>
+                <input type="password" id="password" name="password" required 
+                       class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition">
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-brand-secondary focus:ring-brand-secondary border-gray-300 rounded">
+                    <label for="remember-me" class="font-semibold text-brand-secondary ml-2 block text-sm text-gray-700">Recuérdame</label>
                 </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Contraseña</label>
-                    <input type="password" name="password" required 
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                </div>
+            </div>
 
-                {% if messages %}
-                    <div>
-                        {% for message in messages %}
-                            <p class="text-sm {% if message.tags == 'success' %}text-green-500{% elif message.tags == 'error' %}text-red-500{% else %}text-gray-700{% endif %}">
-                                {{ message }}
-                            </p>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+            {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <p class="text-sm {% if message.tags == 'success' %}text-green-600{% elif message.tags == 'error' %} <i text-red-600{% endif %} font-semibold">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-                <button type="submit"
-                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-full shadow-lg">
-                    Ingresar
-                </button>
-            </form>
-            <p class="text-center text-gray-600 mt-4">
-                ¿No tienes una cuenta?
-                <a href="{% url 'register' %}" class="text-indigo-600 hover:underline font-semibold">Regístrate</a>
-        </div>
-    </main>
-</body>
-</html>
+            <button type="submit"
+                    class="w-full bg-brand-primary hover:opacity-90 text-white font-bold py-3 rounded-lg shadow-lg shadow-brand-primary/30 transition-all duration-300 ease-in-out">
+                Ingresar
+            </button>
+        </form>
+
+        <p class="text-center text-gray-600 mt-6">
+            ¿No tienes una cuenta?
+            <a href="{% url 'register' %}" class="text-brand-secondary hover:text-brand-aux font-semibold">
+                Regístrate aquí
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}

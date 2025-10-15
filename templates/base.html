@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}SERCONN{% endblock %}</title>
+
+    <link href="{% static 'css/dist/output.css' %}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-brand-background text-brand-text font-sans flex flex-col min-h-screen">
+
+    <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 py-4 px-6 md:px-12 sticky top-0 z-50">
+        <div class="flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-brand-text">
+                SER<span class="text-brand-primary">CONN</span>
+            </a>
+            <nav>
+                <a href="{% url 'login' %}" class="font-semibold text-brand-secondary hover:text-brand-aux">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
+            <p>&copy; {% now "Y" %} SERCONN. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
