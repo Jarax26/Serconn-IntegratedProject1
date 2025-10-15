@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, ServiceProvider
+from .models import User, ServiceProvider, Availability
 
 class CustomUserCreationForm(UserCreationForm):
     description = forms.CharField(
@@ -13,7 +13,7 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = [
             "first_name", "last_name", "user_birthdate", "user_city", "user_address",
-            "user_phone", "email", "password1", "password2", "description",
+            "user_phone", "email", "password", "password2", "description",
             "user_role", "user_picture"
         ]
         widgets = {
@@ -22,11 +22,11 @@ class CustomUserCreationForm(UserCreationForm):
                 "id": "id_user_picture",              
                 "accept": "image/*",
                 "class": "block w-full text-sm text-gray-600 cursor-pointer "
-                         "file:mr-4 file:py-2 file:px-4 "
-                         "file:rounded-full file:border-0 "
-                         "file:text-sm file:font-semibold "
-                         "file:bg-indigo-50 file:text-indigo-700 "
-                         "hover:file:bg-indigo-100"
+                        "file:mr-4 file:py-2 file:px-4 "
+                        "file:rounded-full file:border-0 "
+                        "file:text-sm file:font-semibold "
+                        "file:bg-indigo-50 file:text-indigo-700 "
+                        "hover:file:bg-indigo-100"
             })
         }
         labels = {
@@ -37,7 +37,7 @@ class CustomUserCreationForm(UserCreationForm):
             "user_address": "Dirección",
             "user_phone": "Teléfono",
             "email": "Correo Electrónico",
-            "password1": "Contraseña",
+            "password": "Contraseña",
             "password2": "Confirmar Contraseña",
             "user_role": "Tipo de Usuario",
             "user_picture": "Foto de Perfil",
@@ -108,3 +108,11 @@ class EditProfileForm(forms.ModelForm):
             "user_picture": "Foto de Perfil",
         }
 
+class AvailabilityForm(forms.ModelForm):
+    class Meta:
+        model = Availability
+        fields = ['start_time', 'end_time']
+        widgets = {
+            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
