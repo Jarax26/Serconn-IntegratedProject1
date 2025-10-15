@@ -11,13 +11,19 @@
 </head>
 <body class="flex flex-col min-h-screen">
     <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
-        {% if user.is_service_provider %}
-            <h1 class="text-2xl font-bold text-gray-800">
-                <a href="{% url 'profile' %}">SERCONN</a>
-            </h1>
+        {% if user.is_authenticated %}
+            {% if user.is_service_provider %}
+                <h1 class="text-2xl font-bold text-gray-800">
+                    <a href="{% url 'profile' %}">SERCONN</a>
+                </h1>
+            {% else %}
+                <h1 class="text-2xl font-bold text-gray-800">
+                    <a href="{% url 'service_search' %}">SERCONN</a>
+                </h1>
+            {% endif %}
         {% else %}
             <h1 class="text-2xl font-bold text-gray-800">
-                <a href="{% url 'service_search' %}">SERCONN</a>
+                <a href="{% url 'login' %}">SERCONN</a>
             </h1>
         {% endif %}
         <nav>
@@ -33,18 +39,13 @@
                     </button>
                     <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg hidden z-50">
                         <a href="{% url 'profile' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Perfil</a>
-                        <a href="{% url 'notification_list' %}" class="flex justify-between items-center px-4 py-2 hover:bg-indigo-50 text-gray-700">
-                            <span>Notificaciones</span>
-                            {% if unread_notifications > 0 %}
-                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">{{ unread_notifications }}</span>
-                            {% endif %}
-                        </a>
+                        <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
                         {% if user.is_service_provider %}
-                            <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Agregar servicios</a>
-                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis servicios</a>
-                        {% else %}
-                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Mis solicitudes</a>
+                            <a href="{% url 'add_service' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Añadir servicio</a>
+                            <a href="{% url 'availability' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Disponibilidad</a>
                         {% endif %}
+                        <a href="{% url 'notification_list' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Notificaciones</a>
+                        <a href="{% url 'chat_list' %}" class="block px-4 py-2 hover:bg-indigo-50 text-gray-700">Chats</a>
                         <form action="{% url 'logout' %}" method="post" style="margin:0;">
                             {% csrf_token %}
                             <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-indigo-50 text-gray-700">Cerrar sesión</button>
@@ -54,37 +55,66 @@
             {% endif %}
         </nav>
     </header>
-
     <main class="flex-grow">
-        <div class="max-w-4xl mx-auto my-10 bg-white rounded-2xl shadow-lg p-8">
-            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Mis conversaciones</h1>
+        <div class="form-container max-w-4xl mx-auto my-10 bg-white rounded-2xl shadow-lg p-8">
+            <h1 class="text-2xl text-center font-bold text-indigo-800 mb-6">Mis conversaciones</h1>
             <div class="space-y-4">
                 {% for chat in chats %}
-                    <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-4">
-                                {% if chat.seeker.user_picture %}
-                                    <img src="{{ chat.seeker.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
-                                {% else %}
-                                    <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ chat.seeker.get_full_name|slice:":1" }}</span>
-                                {% endif %}
-                                <div>
-                                    <p class="font-semibold text-gray-800">{{ chat.seeker.get_full_name|default:chat.seeker.email }}</p>
-                                    <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                    {% comment %} Determine who the 'other user' in the chat is {% endcomment %}
+                    {% if request.user == chat.seeker %}
+                        {% with other_user=chat.provider %}
+                            <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-4">
+                                        {% if other_user.user_picture %}
+                                            <img src="{{ other_user.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
+                                        {% else %}
+                                            <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ other_user.get_full_name|slice:":1" }}</span>
+                                        {% endif %}
+                                        <div>
+                                            <p class="font-semibold text-gray-800">{{ other_user.get_full_name|default:other_user.email }}</p>
+                                            <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-indigo-600 font-semibold">Responder</span>
                                 </div>
-                            </div>
-                            <span class="text-indigo-600 font-semibold">Responder</span>
-                        </div>
-                    </a>
+                            </a>
+                        {% endwith %}
+                    {% else %}
+                        {% with other_user=chat.seeker %}
+                            <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-4">
+                                        {% if other_user.user_picture %}
+                                            <img src="{{ other_user.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
+                                        {% else %}
+                                            <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ other_user.get_full_name|slice:":1" }}</span>
+                                        {% endif %}
+                                        <div>
+                                            <p class="font-semibold text-gray-800">{{ other_user.get_full_name|default:other_user.email }}</p>
+                                            <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-indigo-600 font-semibold">Responder</span>
+                                </div>
+                            </a>
+                        {% endwith %}
+                    {% endif %}
                 {% empty %}
                     <p class="text-center text-gray-500 py-8">No tienes conversaciones activas.</p>
                 {% endfor %}
             </div>
             <div class="flex justify-end mt-8">
-                <a href="{% url 'profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg">
-                    Volver al perfil
+                {% if user.is_service_seeker %}
+                    <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg m-2">
+                            Ir al inicio
+                    </a>
+                {% endif %}
+                <a href="{% url 'profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg m-2">
+                    Volver a mi perfil
                 </a>
             </div>
+            
         </div>
     </main>
 

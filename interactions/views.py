@@ -5,6 +5,7 @@ from django.http import HttpResponseForbidden
 from .models import Chat, Message, Booking, Notification
 from accounts.models import User
 from searching.models import Service
+from django.db.models import Q, Count
 
 @login_required
 def create_or_find_chat(request, provider_id):
@@ -124,13 +125,19 @@ def cancel_booking(request, booking_id):
 
     # Redirigir si no es POST para evitar cancelaciones accidentales por GET
     return redirect('dashboard')
+
 @login_required
 def chat_list(request):
     """
-    Muestra la lista de conversaciones para un proveedor.
+    Muestra la lista de conversaciones activas (con mensajes) para un usuario.
     """
-    if not request.user.is_service_provider:
-        return redirect('dashboard')
-
-    chats = Chat.objects.filter(provider=request.user).order_by('-created_at')
+    # Obtiene los chats del usuario y los filtra para mostrar solo los que no están vacíos
+    chats = Chat.objects.filter(
+        Q(provider=request.user) | Q(seeker=request.user)
+    ).annotate(
+        message_count=Count('messages')
+    ).filter(
+        message_count__gt=0
+    ).order_by('-created_at')
+    
     return render(request, 'chat_list.html', {'chats': chats})

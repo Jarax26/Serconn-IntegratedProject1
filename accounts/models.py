@@ -82,3 +82,11 @@ class ProviderExperience(models.Model):
 
     def __str__(self):
         return f"{self.experience_name} ({self.service_provider.user.username})"
+
+class Availability(models.Model):
+    provider = models.ForeignKey(ServiceProvider, on_delete=models.CASCADE, related_name='availability')
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+
+    def __str__(self):
+        return f'{self.provider.user.email} is available from {self.start_time} to {self.end_time}'

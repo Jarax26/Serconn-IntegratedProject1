@@ -1,12 +1,11 @@
-from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import User, ServiceProvider
-from .forms import EditProfileForm, ServiceProviderForm
+from django.http import HttpResponseForbidden
+from .forms import CustomUserCreationForm, EditProfileForm, ServiceProviderForm, AvailabilityForm
+from .models import User, ServiceProvider, Availability
 from interactions.models import Chat
-from django.shortcuts import get_object_or_404
 
 
 def register(request):
@@ -16,38 +15,26 @@ def register(request):
             user = form.save()
             messages.success(request, "Tu cuenta se ha creado correctamente. Inicia sesión para continuar.")
             return redirect("login")
-        else:
-            pass
     else:
         form = CustomUserCreationForm()
     return render(request, "register.html", {"form": form})
-
-
-@login_required
-def profile_view(request):
-    return render(request, "profile.html")
 
 
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-
         user = authenticate(request, username=email, password=password)
-
         if user is not None:
             login(request, user)
-
-            # Redirección según rol
-            if user.user_role == "service_seeker": # pyright: ignore[reportAttributeAccessIssue]
-                return redirect("service_search")   # Vista buscador
-            elif user.user_role == "service_provider": # pyright: ignore[reportAttributeAccessIssue]
-                    return redirect("profile")  # Vista proveedor
+            if user.user_role == "service_seeker":
+                return redirect("service_search")
+            elif user.user_role == "service_provider":
+                return redirect("profile")
             else:
-                return redirect("service_search")  # fallback
+                return redirect("service_search")
         else:
             messages.error(request, "Correo o contraseña incorrectos.")
-
     return render(request, "login.html")
 
 
@@ -57,42 +44,14 @@ def logout_view(request):
 
 
 @login_required
-def provider_dashboard(request):
-    provider, created = User.objects.get_or_create(id=request.user.id, defaults={'email': request.user.email})
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST, request.FILES, instance=provider)
-        if form.is_valid():
-            form.save()
-            return redirect('provider_dashboard')
-    else:
-        form = CustomUserCreationForm(instance=provider)
-    return render(request, 'provider_dashboard.html', {'form': form, 'provider': provider})
-
-# @login_required
-# def provider_profile(request):
-#     provider, created = ServiceProvider.objects.get_or_create(user=request.user)
-#     if request.method == 'POST':
-#         form = ServiceProviderForm(request.POST, request.FILES, instance=provider)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('profile')  # recargar la página con los cambios guardados
-#     else:
-#         form = ServiceProviderForm(instance=provider)
-#     return render(request, 'profile.html', {'form': form, 'provider': provider})
-
-
-@login_required
 def edit_profile_view(request):
     user = request.user
     service_provider = None
-
-    if user.is_service_provider:  # solo si el usuario es proveedor
+    if user.is_service_provider:
         service_provider, _ = ServiceProvider.objects.get_or_create(user=user)
-
     if request.method == "POST":
         user_form = EditProfileForm(request.POST, request.FILES, instance=user)
         provider_form = ServiceProviderForm(request.POST, instance=service_provider) if service_provider else None
-
         if user_form.is_valid() and (provider_form is None or provider_form.is_valid()):
             user_form.save()
             if provider_form:
@@ -101,11 +60,8 @@ def edit_profile_view(request):
     else:
         user_form = EditProfileForm(instance=user)
         provider_form = ServiceProviderForm(instance=service_provider) if service_provider else None
+    return render(request, "edit_profile.html", {"form": user_form, "provider_form": provider_form})
 
-    return render(request, "edit_profile.html", {
-        "form": user_form,
-        "provider_form": provider_form
-    })
 
 @login_required
 def profile_view(request):
@@ -114,7 +70,40 @@ def profile_view(request):
         chats = Chat.objects.filter(provider=request.user)
     return render(request, "profile.html", {"chats": chats})
 
+
 @login_required
 def user_profile_view(request, user_id):
     profile_user = get_object_or_404(User, id=user_id)
     return render(request, 'user_profile.html', {'profile_user': profile_user})
+
+
+@login_required
+def availability_view(request):
+    provider = get_object_or_404(ServiceProvider, user=request.user)
+    if request.method == 'POST':
+        form = AvailabilityForm(request.POST)
+        if form.is_valid():
+            availability = form.save(commit=False)
+            availability.provider = provider
+            availability.save()
+            messages.success(request, "Nuevo horario de disponibilidad añadido.")
+            return redirect('availability')
+    else:
+        form = AvailabilityForm()
+    
+    availabilities = Availability.objects.filter(provider=provider).order_by('start_time')
+    return render(request, 'availability.html', {'form': form, 'availabilities': availabilities})
+
+
+@login_required
+def delete_availability(request, availability_id):
+    availability = get_object_or_404(Availability, id=availability_id)
+
+    if availability.provider.user != request.user:
+        return HttpResponseForbidden("No tienes permiso para eliminar este horario.")
+
+    if request.method == 'POST':
+        availability.delete()
+        messages.success(request, "Horario de disponibilidad eliminado correctamente.")
+    
+    return redirect('availability')
