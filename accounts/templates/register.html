@@ -1,151 +1,162 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registro - SERCONN</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-    body { font-family: 'Poppins', sans-serif; background-color: #f7f9fb; }
-  </style>
-</head>
+{% block title %}Crea tu cuenta | SERCONN{% endblock %}
 
-<body class="min-h-screen">
-  <header class="bg-white shadow-sm py-4 px-6 md:px-12 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-gray-800">
-      <a href="{% url 'login' %}">SERCONN</a>
-    </h1>
-  </header>
-
-  <main class="flex-grow flex items-center justify-center px-4 py-10">
-    <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg w-full">
-      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Crear cuenta</h2>
-
-      <!-- Mensajes de error del form -->
-      {% if form.errors %}
-        <div class="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
-          <ul>
-            {% for field in form %}
-              {% if field.errors %}
-                <li><strong>{{ field.label }}:</strong> {{ field.errors|join:", " }}</li>
-              {% endif %}
-            {% endfor %}
-            {% if form.non_field_errors %}
-              <li>{{ form.non_field_errors }}</li>
-            {% endif %}
-          </ul>
-        </div>
-      {% endif %}
-
-      <!-- SIEMPRE visible -->
-      <p class="text-center text-gray-600 mb-6">
-        ¿Ya tienes una cuenta?
-        <a href="{% url 'login' %}" class="text-indigo-600 hover:underline font-semibold">Inicia sesión</a>
-      </p>
-
-      <!-- Botones de rol -->
-      <div class="flex gap-4 justify-center mb-6">
-        <button type="button" id="seekerBtn"
-          class="px-6 py-3 rounded-lg bg-gray-200 text-gray-800 font-semibold transition-colors duration-300">
-          Quiero buscar servicios
+{% block content %}
+<section class="flex items-center justify-center py-16 px-4 bg-gradient-to-br from-white via-brand-background to-white">
+  <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-3xl backdrop-blur-sm">
+    
+    <!-- Step 1: Role Selection -->
+    <div id="roleSelectionStep">
+      <h2 class="text-3xl font-bold text-center text-brand-text mb-2">Únete a SERCONN</h2>
+      <p class="text-center text-sm text-gray-600 mb-8">Para empezar, dinos qué quieres hacer en la plataforma</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Service Seeker Option -->
+        <button type="button" data-role="service_seeker" class="role-btn group p-6 border-2 border-gray-200 rounded-xl text-left hover:border-brand-secondary hover:shadow-lg transition-all duration-300">
+          <div class="flex flex-col gap-3">
+            <div class="bg-brand-secondary/10 text-brand-secondary p-4 rounded-full w-fit group-hover:scale-110 transition-transform duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-brand-text text-xl mb-1">Buscar servicios</h3>
+              <p class="text-sm text-gray-600">Encuentra y contrata profesionales de confianza para tus necesidades</p>
+            </div>
+          </div>
         </button>
-        <button type="button" id="providerBtn"
-          class="px-6 py-3 rounded-lg bg-gray-200 text-gray-800 font-semibold transition-colors duration-300">
-          Quiero ofrecer servicios
+
+        <!-- Service Provider Option -->
+        <button type="button" data-role="service_provider" class="role-btn group p-6 border-2 border-gray-200 rounded-xl text-left hover:border-brand-primary hover:shadow-lg transition-all duration-300">
+          <div class="flex flex-col gap-3">
+            <div class="bg-brand-primary/10 text-brand-primary p-4 rounded-full w-fit group-hover:scale-110 transition-transform duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-brand-text text-xl mb-1">Ofrecer servicios</h3>
+              <p class="text-sm text-gray-600">Consigue nuevos clientes y haz crecer tu negocio profesional</p>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Registration Form -->
+    <form method="post" enctype="multipart/form-data" id="registerForm" class="hidden">
+      {% csrf_token %}
+      {{ form.user_role }}
+
+      <div class="flex justify-between items-center mb-6 pb-4 border-b">
+        <h2 class="text-3xl font-bold text-brand-text">Completa tus datos</h2>
+        <button type="button" id="changeRoleBtn" class="text-sm font-semibold text-brand-secondary hover:text-brand-primary transition duration-300 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+          </svg>
+          Cambiar rol
         </button>
       </div>
 
-      <!-- Formulario (oculto al inicio si no hay rol) -->
-      <form method="post" enctype="multipart/form-data"
-            class="space-y-6 {% if not form.data.user_role %}hidden{% endif %}" id="registerForm">
-        {% csrf_token %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for field in form %}
+          {% if field.name != 'user_role' and field.name != 'description' %}
+            <div class="{% if field.name == 'user_picture' or field.name == 'user_address' %}md:col-span-2{% endif %}">
+              <label for="{{ field.id_for_label }}" class="block text-brand-text font-semibold mb-2">
+                {{ field.label }}
+              </label>
+              
+              {% if field.field.widget.input_type == 'select' %}
+                {{ field }}
+              {% elif field.field.widget.input_type == 'file' %}
+                <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}" accept="image/*" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-primary/10 file:text-brand-primary hover:file:bg-brand-primary/20">
+              {% elif field.field.widget.input_type == 'textarea' %}
+                <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="3" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition">{{ field.value|default:'' }}</textarea>
+              {% else %}
+                <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" {% if field.field.required %}required{% endif %} class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition">
+              {% endif %}
+              
+              <p id="{{ field.id_for_label }}-error" class="text-red-600 text-sm mt-1 hidden"></p>
+              
+              {% if field.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ field.errors|first }}</p>
+              {% endif %}
+              
+              {% if field.name == 'password1' %}
+                <div class="mt-3 p-4 bg-brand-background rounded-lg border border-gray-200">
+                  <p class="text-xs font-semibold text-gray-700 mb-2">Requisitos de contraseña:</p>
+                  <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                    <li>Mínimo 8 caracteres</li>
+                    <li>No puede ser demasiado común</li>
+                    <li>Debe contener letras y números</li>
+                  </ul>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
 
-        <!-- Campo oculto del rol (usa el del form para id/validación correcta) -->
-        {{ form.user_role.as_hidden }}
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label for="{{ form.first_name.id_for_label }}" class="block text-gray-700 font-semibold">Nombre</label>
-            {{ form.first_name }}
-          </div>
-          <div>
-            <label for="{{ form.last_name.id_for_label }}" class="block text-gray-700 font-semibold">Apellido</label>
-            {{ form.last_name }}
-          </div>
-          <div>
-            <label for="{{ form.user_birthdate.id_for_label }}" class="block text-gray-700 font-semibold">Fecha de Nacimiento</label>
-            {{ form.user_birthdate }}
-          </div>
-          <div>
-            <label for="{{ form.user_city.id_for_label }}" class="block text-gray-700 font-semibold">Ciudad</label>
-            {{ form.user_city }}
-          </div>
-          <div>
-            <label for="{{ form.user_address.id_for_label }}" class="block text-gray-700 font-semibold">Dirección</label>
-            {{ form.user_address }}
-          </div>
-          <div>
-            <label for="{{ form.user_phone.id_for_label }}" class="block text-gray-700 font-semibold">Teléfono</label>
-            {{ form.user_phone }}
-          </div>
-          <div>
-            <label for="{{ form.email.id_for_label }}" class="block text-gray-700 font-semibold">Correo Electrónico</label>
-            {{ form.email }}
-          </div>
-          <div>
-            <label for="{{ form.password.id_for_label }}" class="block text-gray-700 font-semibold">Contraseña</label>
-            {{ form.password1 }}
-          </div>
-          <div>
-            <label for="{{ form.password2.id_for_label }}" class="block text-gray-700 font-semibold">Confirmar Contraseña</label>
-            {{ form.password2 }}
-          </div>
-
-          <!-- Foto de perfil -->
-          <div class="md:col-span-2">
-            <label for="id_user_picture" class="block text-gray-700 font-semibold mb-2">Foto de perfil</label>
-            <!-- Forzamos un id conocido para el JS -->
-            <input type="file" name="user_picture" id="id_user_picture" accept="image/*"
-              class="block w-full text-sm text-gray-600 cursor-pointer
-                     file:mr-4 file:py-2 file:px-4
-                     file:rounded-full file:border-0
-                     file:text-sm file:font-semibold
-                     file:bg-indigo-50 file:text-indigo-700
-                     hover:file:bg-indigo-100">
-            <p class="mt-1 text-sm text-gray-500">PNG, JPG o GIF (máx. 2MB)</p>
-            <span id="fileError" class="hidden text-red-600 font-bold flex items-center gap-2">
-                Debes subir una foto de perfil
-            </span>
-          </div>
-        </div>
-
-        <!-- Campos específicos del provider -->
-        <div id="providerFields"
-             class="mt-6 {% if form.data.user_role != 'service_provider' %}hidden{% endif %}">
-          <label for="{{ form.description.id_for_label }}" class="block text-gray-700 font-semibold">
+        <!-- Provider Description Field -->
+        <div id="providerFields" class="md:col-span-2 hidden">
+          <label for="{{ form.description.id_for_label }}" class="block text-brand-text font-semibold mb-2">
             {{ form.description.label }}
           </label>
-          {{ form.description }}
+          <textarea name="description" id="{{ form.description.id_for_label }}" rows="4" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition" placeholder="Cuéntanos sobre tus servicios, experiencia y especialidades..."></textarea>
+          
+          <p id="{{ form.description.id_for_label }}-error" class="text-red-600 text-sm mt-1 hidden"></p>
+          
+          {% if form.description.errors %}
+            <p class="text-red-600 text-sm mt-1">{{ form.description.errors|first }}</p>
+          {% endif %}
         </div>
+      </div>
 
-        <button type="submit"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-full shadow-lg mt-8">
-          Registrarme
-        </button>
-      </form>
-    </div>
-  </main>
+      <button type="submit" id="submit-btn-js" class="w-full bg-brand-primary hover:bg-brand-secondary text-white font-bold py-3 rounded-full shadow-md shadow-brand-primary/30 hover:shadow-lg hover:shadow-brand-secondary/30 transition-all duration-300 mt-8">
+        Crear mi cuenta
+      </button>
+    </form>
 
-  <script src="{% static 'script.js' %}"></script>
+    <p class="text-center text-gray-600 mt-6">
+      ¿Ya tienes una cuenta?
+      <a href="{% url 'login' %}" class="text-brand-secondary hover:text-brand-primary hover:underline font-semibold transition">
+        Inicia sesión
+      </a>
+    </p>
+  </div>
+</section>
 
-  <!-- Si hubo POST con rol, re-selecciona rol para mantener el estado visible -->
-  {% if form.data.user_role %}
-    <script>
-      window.__initialSelectedRole = "{{ form.data.user_role|escapejs }}";
-    </script>
-  {% endif %}
-</body>
-</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const roleButtons = document.querySelectorAll('.role-btn');
+  const roleSelectionStep = document.getElementById('roleSelectionStep');
+  const registerForm = document.getElementById('registerForm');
+  const userRoleInput = document.querySelector('input[name="user_role"]');
+  const changeRoleBtn = document.getElementById('changeRoleBtn');
+  const providerFields = document.getElementById('providerFields');
+
+  roleButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const selectedRole = this.getAttribute('data-role');
+      userRoleInput.value = selectedRole;
+      
+      roleSelectionStep.classList.add('hidden');
+      registerForm.classList.remove('hidden');
+      
+      if (selectedRole === 'service_provider') {
+        providerFields.classList.remove('hidden');
+      } else {
+        providerFields.classList.add('hidden');
+      }
+    });
+  });
+
+  changeRoleBtn.addEventListener('click', function() {
+    registerForm.classList.add('hidden');
+    roleSelectionStep.classList.remove('hidden');
+    providerFields.classList.add('hidden');
+  });
+});
+</script>
+{% endblock %}

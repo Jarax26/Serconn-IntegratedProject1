@@ -6,17 +6,31 @@ from django.http import HttpResponseForbidden
 from .forms import CustomUserCreationForm, EditProfileForm, ServiceProviderForm, AvailabilityForm
 from .models import User, ServiceProvider, Availability
 from interactions.models import Chat
-
+from django.http import JsonResponse
+from django.urls import reverse
+import json
 
 def register(request):
+    # Si la petición es POST, la manejamos como una validación AJAX
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
+            # Aunque no se mostrará de inmediato, es bueno dejar el mensaje para la sesión
             messages.success(request, "Tu cuenta se ha creado correctamente. Inicia sesión para continuar.")
-            return redirect("login")
+            
+            # Construye la URL de login para la redirección en el frontend
+            login_url = reverse('login')
+            return JsonResponse({'status': 'success', 'redirect_url': login_url})
+        else:
+            # Si el formulario no es válido, devuelve los errores como JSON
+            # json.loads convierte el string de errores de Django a un diccionario real
+            return JsonResponse({'status': 'error', 'errors': json.loads(form.errors.as_json())})
+
+    # Si la petición es GET, simplemente muestra el formulario vacío
     else:
         form = CustomUserCreationForm()
+    
     return render(request, "register.html", {"form": form})
 
 

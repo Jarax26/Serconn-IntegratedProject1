@@ -45,6 +45,15 @@
                             </form>
                         </div>
                     </div>
+                {% else %}
+                    <div class="flex items-center gap-4">
+                        <a href="{% url 'login' %}" class="font-semibold text-gray-600 hover:text-brand-secondary transition">
+                            Iniciar sesión
+                        </a>
+                        <a href="{% url 'register' %}" class="font-semibold text-gray-600 hover:text-brand-secondary transition">
+                            Registrarse
+                        </a>
+                    </div>
                 {% endif %}
             </nav>
         </div>
@@ -60,6 +69,6 @@
             <p>&copy; {% now "Y" %} SERCONN. Todos los derechos reservados.</p>
         </div>
     </footer>
-
+    <script src="{% static 'script.js' %}"></script>
 </body>
 </html>
