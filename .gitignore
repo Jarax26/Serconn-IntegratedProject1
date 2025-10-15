@@ -38,7 +38,7 @@ ENV/
 env.bak/
 venv.bak/
 
-# VSCode (si estás usando VSCode)
+# VSCode
 .vscode/
 
 # IDEs and project settings
@@ -90,3 +90,8 @@ serconn_p1/__pycache__/
 
 # PyInstaller
 *.spec
+
+# Node / Tailwind CSS
+node_modules/
+/static/css/dist/
+npm-debug.log*

@@ -1,0 +1,26 @@
+{
+  "name": "serconn_projectintegrated1",
+  "version": "1.0.0",
+  "description": "**SERCONN** is a platform designed to connect service seekers with service providers. It offers a comprehensive solution for searching, booking, and managing various professional services. The platform ensures a secure and efficient process through a robust backend developed with Django and a real-time communication system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "tailwindcss -i ./static/css/src/input.css -o ./static/css/dist/output.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jarax26/Serconn-IntegratedProject1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jarax26/Serconn-IntegratedProject1/issues"
+  },
+  "homepage": "https://github.com/Jarax26/Serconn-IntegratedProject1#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.3"
+  }
+}
