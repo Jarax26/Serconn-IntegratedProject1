@@ -162,7 +162,10 @@ class ServiceProviderForm(forms.ModelForm):
         model = ServiceProvider
         fields = ["description"]
         widgets = {
-            "description": forms.Textarea(attrs={"class": "border rounded-lg p-2 w-full", "rows": 4}),
+            "description": forms.Textarea(attrs={
+                "class": "w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition",
+                "rows": 4
+            }),
         }
         labels = {
             "description": "Descripción",
@@ -171,16 +174,23 @@ class ServiceProviderForm(forms.ModelForm):
 class EditProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email", "user_city", "user_address",  "user_phone", "user_picture"]
+        fields = ["first_name", "last_name", "email", "user_city", "user_address", "user_phone", "user_picture"]
+        
+        # Clases CSS consistentes con el formulario de registro
+        common_classes = 'w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition'
+        
         widgets = {
-            "first_name": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
-            "last_name": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
-            "email": forms.EmailInput(attrs={"class": "border rounded-lg p-2 w-full"}),
-            "user_city": forms.Select(attrs={"class": "border rounded-lg p-2 w-full"}),
-            "user_address": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
-            "user_phone": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
-            "user_picture": forms.FileInput(attrs={"class": "border rounded-lg p-2 w-full"}),
+            "first_name": forms.TextInput(attrs={"class": common_classes}),
+            "last_name": forms.TextInput(attrs={"class": common_classes}),
+            "email": forms.EmailInput(attrs={"class": common_classes}),
+            "user_city": forms.Select(attrs={"class": common_classes}),
+            "user_address": forms.TextInput(attrs={"class": common_classes}),
+            "user_phone": forms.TextInput(attrs={"class": common_classes}),
+            "user_picture": forms.FileInput(attrs={
+                "class": "w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-primary/10 file:text-brand-primary hover:file:bg-brand-primary/20"
+            }),
         }
+        
         labels = {
             "first_name": "Nombres",
             "last_name": "Apellidos",
@@ -236,6 +246,9 @@ class EditProfileForm(forms.ModelForm):
         if phone and len(phone) < 7:
             raise ValidationError("El número de teléfono debe tener al menos 7 dígitos.", code='invalid_phone_length')
         return phone
+    
+
+
 
 class AvailabilityForm(forms.ModelForm):
     class Meta:

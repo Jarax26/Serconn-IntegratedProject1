@@ -25,7 +25,7 @@
                 </p>
             </div>
             <div class="ml-auto">
-                <a href="{% url 'edit_profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full shadow font-semibold transition-colors">Editar perfil</a>
+                <a href="{% url 'edit_profile' %}" class="bg-brand-primary hover:bg-brand-secondary text-white px-4 py-2 rounded-full shadow font-semibold transition-colors">Editar perfil</a>
             </div>
         </div>
 
@@ -82,7 +82,7 @@
 
                 <div class="flex justify-center mt-6">
                     <a href="{% url 'add_service' %}" title="Agregar servicio"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg transition-transform hover:scale-110">
+                        class="bg-brand-primary hover:bg-brand-secondary text-white w-14 h-14 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg transition-transform hover:scale-110">
                         +
                     </a>
                 </div>
@@ -90,17 +90,17 @@
         {% endif %}
 
         <div class="flex flex-wrap justify-center gap-4 mt-8 border-t pt-6">
-            <a href="{% url 'notification_list' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700">
+            <a href="{% url 'notification_list' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-brand-primary text-white font-semibold rounded-full shadow hover:bg-brand-secondary">
                 Notificaciones
             </a>
-            <a href="{% url 'chat_list' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700">
+            <a href="{% url 'chat_list' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-brand-primary text-white font-semibold rounded-full shadow hover:bg-brand-secondary">
                 Chats
             </a>
-            <a href="{% url 'dashboard' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700">
+            <a href="{% url 'dashboard' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-brand-primary text-white font-semibold rounded-full shadow hover:bg-brand-secondary">
                 Solicitudes
             </a>
             {% if user.is_service_provider %}
-                <a href="{% url 'availability' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700">
+                <a href="{% url 'availability' %}" class="flex justify-center items-center text-center flex-1 px-4 py-2 bg-brand-primary text-white font-semibold rounded-full shadow hover:bg-brand-secondary">
                     Disponibilidad
                 </a>
             {% endif %}

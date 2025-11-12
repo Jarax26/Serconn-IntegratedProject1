@@ -1,52 +1,106 @@
 {% extends 'base.html' %}
-{% block title %} Detalles Perfil: {{ provider.user.get_full_name }} | SERCONN{% endblock %}
+{% block title %}Detalles Perfil: {{ provider.user.get_full_name }} | SERCONN{% endblock %}
 
 {% block content %}
-    <main class="container mx-auto px-4 py-8 md:py-12 flex-grow">
-        <div class="bg-white p-6 md:p-10 rounded-2xl shadow-xl max-w-4xl mx-auto">
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-8 border-b pb-8 mb-8">
-                {% if provider.user.user_picture %}
-                    <img src="{{ provider.user.user_picture.url }}" alt="Foto de perfil de {{ provider.user.username }}" class="w-32 h-32 rounded-full object-cover flex-shrink-0">
-                {% else %}
-                    <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-5xl font-bold flex-shrink-0">
-                        {{ provider.user.first_name|slice:":1" }}
+<section class="py-16 px-4 bg-gradient-to-br from-white via-brand-background to-white min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl backdrop-blur-sm overflow-hidden">
+            
+            <!-- Header del perfil -->
+            <div class="p-10 border-b bg-gradient-to-r from-brand-background to-white">
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+                    <!-- Foto de perfil -->
+                    <div class="flex-shrink-0">
+                        {% if provider.user.user_picture %}
+                            <img src="{{ provider.user.user_picture.url }}" 
+                                 alt="Foto de perfil de {{ provider.user.username }}" 
+                                 class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+                        {% else %}
+                            <div class="w-32 h-32 rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white text-5xl font-bold shadow-lg border-4 border-white">
+                                {{ provider.user.first_name|slice:":1" }}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-                <div class="text-center md:text-left">
-                    <h1 class="text-4xl font-bold text-gray-800">{{ provider.user.get_full_name|default:provider.user.username }}</h1>
-                    <p class="text-gray-600 font-bold">Score: {{ provider.user.user_score }} ⭐</p>
-                    <p class="mt-2 text-xl text-gray-600">{{ provider.user.service_provider_profile.description|default:"Sin descripción" }}</p>
                     
-                    {% if user.is_authenticated and user.is_service_seeker %}
-                        <div class="mt-6">
-                            <a href="{% url 'create_or_find_chat' provider.user.id %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                    <!-- Información del perfil -->
+                    <div class="flex-grow text-center md:text-left">
+                        <h1 class="text-4xl font-bold text-brand-text mb-2">
+                            {{ provider.user.get_full_name|default:provider.user.username }}
+                        </h1>
+                        
+                        <!-- Score -->
+                        <div class="flex items-center justify-start md:justify-start gap-2 mb-3">
+                            <div class="flex items-center bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <span class="text-sm font-bold text-yellow-800">{{ provider.user.user_score }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Descripción -->
+                        <p class="text-gray-600 leading-relaxed mb-6">
+                            {{ provider.user.service_provider_profile.description|default:"Sin descripción" }}
+                        </p>
+                        
+                        <!-- Botón de chat -->
+                        {% if user.is_authenticated and user.is_service_seeker %}
+                            <a href="{% url 'create_or_find_chat' provider.user.id %}" 
+                               class="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-secondary text-white font-bold py-3 px-6 rounded-full shadow-md shadow-brand-primary/30 hover:shadow-lg hover:shadow-brand-secondary/30 transition-all duration-300 transform hover:scale-105">
                                 Iniciar chat
                             </a>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
-            <section>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Servicios y precios</h2>
+            <!-- Servicios y precios -->
+            <div class="p-10">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-brand-text mb-2">Servicios y precios</h2>
+                    <p class="text-sm text-gray-600">Estos son los servicios que ofrece este profesional</p>
+                </div>
+
                 {% if services_offered %}
-                    <ul class="grid md:grid-cols-2 gap-6">
+                    <div class="grid md:grid-cols-2 gap-6">
                         {% for service in services_offered %}
-                            <li class="bg-gray-50 p-6 rounded-2xl shadow-inner border border-gray-100 flex flex-col justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-lg text-indigo-600">{{ service.name }}</h3>
-                                    <p class="text-gray-600 mt-2">{{ service.description }}</p>
-                                    <p class="mt-4 text-gray-700">Costo: <span class="text-2xl font-bold text-indigo-700">${{ service.rate|floatformat:0 }}</span></p>
+                            <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-100 hover:border-brand-primary/50 hover:shadow-md transition-all duration-300">
+                                <!-- Icono de servicio -->
+                                <div class="flex items-start gap-4 mb-3">
+                                    <div class="flex-grow">
+                                        <h3 class="font-bold text-lg text-brand-text mb-1">{{ service.name }}</h3>
+                                        <p class="text-gray-600 text-sm leading-relaxed">{{ service.description }}</p>
+                                    </div>
                                 </div>
-                                </li>
+                                
+                                <!-- Precio -->
+                                <div class="mt-4 pt-4 border-t border-gray-200">
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="text-sm text-gray-600 font-medium">Costo:</span>
+                                        <span class="text-3xl font-bold text-brand-primary">${{ service.rate|floatformat:0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% else %}
-                    <div class="text-center text-gray-500 p-8 bg-gray-50 rounded-2xl shadow-inner">
-                        <p class="text-lg">Este proveedor aún no ha listado sus servicios.</p>
+                    <div class="text-center py-16">
+                        <p class="text-gray-500 font-medium text-lg">Este proveedor aún no ha listado sus servicios</p>
+                        <p class="text-sm text-gray-400 mt-2">Vuelve más tarde para ver sus ofertas</p>
                     </div>
                 {% endif %}
-            </section>
+            </div>
+
+            <!-- Botón de navegación -->
+            {% if user.is_authenticated %}
+                <div class="p-10 pt-6 border-t bg-gray-50">
+                    <a href="{% url 'service_search' %}" 
+                       class="block text-center px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-full hover:bg-gray-300 transition-all duration-300">
+                        Volver a búsqueda de servicios
+                    </a>
+                </div>
+            {% endif %}
         </div>
-    </main>
+    </div>
+</section>
 {% endblock %}

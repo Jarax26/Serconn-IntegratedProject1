@@ -1,67 +1,126 @@
 {% extends 'base.html' %}
-{% block title %} Mis Conversaciones | SERCONN{% endblock %}
+{% block title %}Mis Conversaciones | SERCONN{% endblock %}
 
 {% block content %}
-    <main class="flex-grow">
-        <div class="form-container max-w-4xl mx-auto my-10 bg-white rounded-2xl shadow-lg p-8">
-            <h1 class="text-2xl text-center font-bold text-indigo-800 mb-6">Mis conversaciones</h1>
-            <div class="space-y-4">
-                {% for chat in chats %}
-                    {% comment %} Determine who the 'other user' in the chat is {% endcomment %}
-                    {% if request.user == chat.seeker %}
-                        {% with other_user=chat.provider %}
-                            <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
-                                <div class="flex justify-between items-center">
-                                    <div class="flex items-center gap-4">
-                                        {% if other_user.user_picture %}
-                                            <img src="{{ other_user.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
-                                        {% else %}
-                                            <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ other_user.get_full_name|slice:":1" }}</span>
-                                        {% endif %}
-                                        <div>
-                                            <p class="font-semibold text-gray-800">{{ other_user.get_full_name|default:other_user.email }}</p>
-                                            <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-indigo-600 font-semibold">Responder</span>
-                                </div>
-                            </a>
-                        {% endwith %}
-                    {% else %}
-                        {% with other_user=chat.seeker %}
-                            <a href="{% url 'chat_view' chat.id %}" class="block p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
-                                <div class="flex justify-between items-center">
-                                    <div class="flex items-center gap-4">
-                                        {% if other_user.user_picture %}
-                                            <img src="{{ other_user.user_picture.url }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
-                                        {% else %}
-                                            <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ other_user.get_full_name|slice:":1" }}</span>
-                                        {% endif %}
-                                        <div>
-                                            <p class="font-semibold text-gray-800">{{ other_user.get_full_name|default:other_user.email }}</p>
-                                            <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-indigo-600 font-semibold">Responder</span>
-                                </div>
-                            </a>
-                        {% endwith %}
-                    {% endif %}
-                {% empty %}
-                    <p class="text-center text-gray-500 py-8">No tienes conversaciones activas.</p>
-                {% endfor %}
+<section class="py-16 px-4 bg-gradient-to-br from-white via-brand-background to-white min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        
+        <div class="bg-white rounded-2xl shadow-xl backdrop-blur-sm overflow-hidden">
+            
+            <!-- Header -->
+            <div class="p-10 pb-6 border-b">
+                <h1 class="text-3xl font-bold text-brand-text mb-2">Mis conversaciones</h1>
+                <p class="text-sm text-gray-600">Mantente en contacto con tus clientes y proveedores</p>
             </div>
-            <div class="flex justify-end mt-8">
+
+            <!-- Lista de conversaciones -->
+            <div class="p-10">
+                {% if chats %}
+                    <div class="space-y-4">
+                        {% for chat in chats %}
+                            {% comment %} Determine who the 'other user' in the chat is {% endcomment %}
+                            {% if request.user == chat.seeker %}
+                                {% with other_user=chat.provider %}
+                                    <a href="{% url 'chat_view' chat.id %}" 
+                                       class="block p-6 border-2 border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-white hover:border-brand-primary hover:shadow-lg transition-all duration-300 group">
+                                        <div class="flex justify-between items-center">
+                                            <div class="flex items-center gap-4">
+                                                <!-- Avatar -->
+                                                {% if other_user.user_picture %}
+                                                    <img src="{{ other_user.user_picture.url }}" 
+                                                         alt="Foto de perfil" 
+                                                         class="w-14 h-14 rounded-full object-cover border-2 border-gray-200 group-hover:border-brand-primary transition-colors duration-300">
+                                                {% else %}
+                                                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-xl border-2 border-gray-200 group-hover:border-brand-primary transition-colors duration-300">
+                                                        {{ other_user.get_full_name|slice:":1" }}
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <!-- Información del usuario -->
+                                                <div>
+                                                    <p class="font-bold text-lg text-brand-text group-hover:text-brand-primary transition-colors duration-300">
+                                                        {{ other_user.get_full_name|default:other_user.email }}
+                                                    </p>
+                                                    <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Indicador de acción -->
+                                            <div class="flex items-center gap-2 text-brand-primary group-hover:text-brand-secondary font-semibold transition-colors duration-300">
+                                                <span>Abrir</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </a>
+                                {% endwith %}
+                            {% else %}
+                                {% with other_user=chat.seeker %}
+                                    <a href="{% url 'chat_view' chat.id %}" 
+                                       class="block p-6 border-2 border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-white hover:border-brand-primary hover:shadow-lg transition-all duration-300 group">
+                                        <div class="flex justify-between items-center">
+                                            <div class="flex items-center gap-4">
+                                                <!-- Avatar -->
+                                                {% if other_user.user_picture %}
+                                                    <img src="{{ other_user.user_picture.url }}" 
+                                                         alt="Foto de perfil" 
+                                                         class="w-14 h-14 rounded-full object-cover border-2 border-gray-200 group-hover:border-brand-primary transition-colors duration-300">
+                                                {% else %}
+                                                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-xl border-2 border-gray-200 group-hover:border-brand-primary transition-colors duration-300">
+                                                        {{ other_user.get_full_name|slice:":1" }}
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <!-- Información del usuario -->
+                                                <div>
+                                                    <p class="font-bold text-lg text-brand-text group-hover:text-brand-primary transition-colors duration-300">
+                                                        {{ other_user.get_full_name|default:other_user.email }}
+                                                    </p>
+                                                    <p class="text-sm text-gray-500">Haz clic para ver la conversación</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Indicador de acción -->
+                                            <div class="flex items-center gap-2 text-brand-primary group-hover:text-brand-secondary font-semibold transition-colors duration-300">
+                                                <span>Abrir</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </a>
+                                {% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- Estado vacío -->
+                    <div class="text-center py-16">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <p class="text-gray-500 font-medium text-lg">No tienes conversaciones activas</p>
+                        <p class="text-sm text-gray-400 mt-2">Tus conversaciones con clientes y proveedores aparecerán aquí</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Botones de navegación -->
+            <div class="p-10 pt-6 border-t bg-gray-50 flex flex-col sm:flex-row gap-4">
                 {% if user.is_service_seeker %}
-                    <a href="{% url 'service_search' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg m-2">
-                            Ir al inicio
+                    <a href="{% url 'service_search' %}" 
+                       class="flex-1 text-center px-6 py-3 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-full shadow-md shadow-brand-primary/30 hover:shadow-lg hover:shadow-brand-secondary/30 transition-all duration-300">
+                        Ir al inicio
                     </a>
                 {% endif %}
-                <a href="{% url 'profile' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg m-2">
+                <a href="{% url 'profile' %}" 
+                   class="flex-1 text-center px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-full hover:bg-gray-300 transition-all duration-300">
                     Volver a mi perfil
                 </a>
             </div>
-            
+
         </div>
-    </main>
+    </div>
+</section>
 {% endblock %}

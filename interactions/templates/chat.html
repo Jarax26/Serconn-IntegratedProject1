@@ -1,142 +1,259 @@
 {% extends 'base.html' %}
-{% block title %} Chat | SERCONN{% endblock %}
+{% block title %}Chat | SERCONN{% endblock %}
 
 {% block content %}
-    <main class="container mx-auto px-4 py-8 md:py-12 flex-grow">
-        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-4xl mx-auto">
-            
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border mb-4">
-                {% if user.is_service_seeker %}
-                    {% with other_user=chat.provider %}
-                    <a href="{% url 'user_profile' other_user.id %}?chat_id={{ chat.id }}" class="flex items-center gap-4">
-                        {% if other_user.user_picture %}
-                            <img src="{{ other_user.user_picture.url }}" alt="Perfil" class="w-12 h-12 rounded-full object-cover">
-                        {% else %}
-                            <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ other_user.get_full_name|slice:":1" }}</span>
-                        {% endif %}
-                        <div>
-                            <p class="font-bold text-gray-800">{{ other_user.get_full_name }}</p>
-                            <p class="text-sm text-gray-600">Ver perfil del proveedor</p>
-                        </div>
-                    </a>
-                    {% endwith %}
-                {% else %}
-                    {% with other_user=chat.seeker %}
-                    <a href="{% url 'user_profile' other_user.id %}?chat_id={{ chat.id }}" class="flex items-center gap-4">
-                        {% if other_user.user_picture %}
-                            <img src="{{ other_user.user_picture.url }}" alt="Perfil" class="w-12 h-12 rounded-full object-cover">
-                        {% else %}
-                            <span class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-bold text-xl">{{ other_user.get_full_name|slice:":1" }}</span>
-                        {% endif %}
-                        <div>
-                            <p class="font-bold text-gray-800">{{ other_user.get_full_name }}</p>
-                            <p class="text-sm text-gray-600">Ver perfil del cliente</p>
-                        </div>
-                    </a>
-                    {% endwith %}
-                {% endif %}
+<section class="flex items-center justify-center py-16 px-4 bg-gradient-to-br from-white via-brand-background to-white min-h-screen">
+  <div class="w-full max-w-4xl">
+    
+    <div class="bg-white rounded-2xl shadow-xl backdrop-blur-sm overflow-hidden">
+      
+      <!-- Header del chat con información del usuario -->
+      <div class="bg-gradient-to-r from-brand-primary to-brand-secondary p-6">
+        <div class="flex justify-between items-center">
+          {% if user.is_service_seeker %}
+            {% with other_user=chat.provider %}
+            <a href="{% url 'user_profile' other_user.id %}?chat_id={{ chat.id }}" 
+               class="flex items-center gap-4 hover:opacity-90 transition-opacity">
+              {% if other_user.user_picture %}
+                <img src="{{ other_user.user_picture.url }}" alt="Perfil" 
+                     class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md">
+              {% else %}
+                <span class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold text-2xl text-white border-2 border-white">
+                  {{ other_user.get_full_name|slice:":1" }}
+                </span>
+              {% endif %}
+              <div>
+                <p class="font-bold text-brand-primary text-lg">{{ other_user.get_full_name }}</p>
+                <p class="text-sm text-brand-secondary/80 hover:text-white hover:underline transition-colors duration-300 flex items-center gap-1">
+                Ver perfil del proveedor
+                </p>
+              </div>
+            </a>
+            {% endwith %}
+          {% else %}
+            {% with other_user=chat.seeker %}
+            <a href="{% url 'user_profile' other_user.id %}?chat_id={{ chat.id }}" 
+               class="flex items-center gap-4 hover:opacity-90 transition-opacity">
+              {% if other_user.user_picture %}
+                <img src="{{ other_user.user_picture.url }}" alt="Perfil" 
+                     class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md">
+              {% else %}
+                <span class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold text-2xl text-white border-2 border-white">
+                  {{ other_user.get_full_name|slice:":1" }}
+                </span>
+              {% endif %}
+              <div>
+                <p class="font-bold text-brand-primary text-lg">{{ other_user.get_full_name }}</p>
+                <p class="text-sm text-brand-secondary/80 hover:text-white hover:underline transition-colors duration-300 flex items-center gap-1">
+                Ver perfil del cliente
+                </p>
+              </div>
+            </a>
+            {% endwith %}
+          {% endif %}
 
-                <form action="{% url 'empty_chat' chat.id %}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar todos los mensajes de esta conversación? Esta acción no se puede deshacer.');">
-                    {% csrf_token %}
-                    <button type="submit" class="text-sm bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-full transition-colors duration-300">
-                        Vaciar chat
-                    </button>
-                </form>
-            </div>
-            <div id="message-box" class="space-y-4 p-4 h-96 overflow-y-auto bg-gray-100 rounded-lg border">
-                {% for message in messages %}
-                    <div class="flex {% if message.sender == user %}justify-end{% else %}justify-start{% endif %}">
-                        <div class="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl {% if message.sender == user %}bg-indigo-600 text-white{% else %}bg-gray-200 text-gray-800{% endif %}">
-                            <p>{{ message.content }}</p>
-                            <span class="text-xs {% if message.sender == user %}text-indigo-200{% else %}text-gray-500{% endif %} block text-right mt-1">{{ message.timestamp|date:"h:i A" }}</span>
-                        </div>
-                    </div>
-                {% empty %}
-                    <p class="text-center text-gray-500 py-4">Aún no hay mensajes. ¡Inicia la conversación!</p>
-                {% endfor %}
-            </div>
-
-            <div class="mt-6 flex gap-3 items-center border-t pt-6">
-                <form id="message-form" action="{% url 'send_message' chat.id %}" method="post" class="flex-grow flex gap-3 items-center">
-                    {% csrf_token %}
-                    <textarea name="content" required class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Escribe tu mensaje..." rows="1"></textarea>
-                    <button id="send-message-btn" type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-lg">Enviar</button>
-                </form>
-                
-                {% if user.is_service_seeker %}
-                <button id="booking-modal-btn" type="button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg">Solicitar</button>
-                {% endif %}
-            </div>
-            
-            <div class="text-center mt-6">
-                <a href="{% url 'profile' %}" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-5 rounded-full shadow-lg transition-colors duration-300 m-3">
-                    Volver a mi perfil
-                </a>
-                <a href="{% url 'chat_list' %}" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-5 rounded-full shadow-lg transition-colors duration-300 m-3">
-                    Volver a mis chats
-                </a>
-            </div>
-
+          <form action="{% url 'empty_chat' chat.id %}" method="post" 
+                onsubmit="return confirm('¿Estás seguro de que deseas eliminar todos los mensajes de esta conversación? Esta acción no se puede deshacer.');">
+            {% csrf_token %}
+            <button type="submit" 
+                    class="bg-brand-primary text-white font-semibold py-2 px-4 rounded-full transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg">
+            Vaciar chat
+            </button>
+          </form>
         </div>
-    </main>
+      </div>
 
-    {% if user.is_service_seeker %}
-    <div id="booking-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl w-full max-w-lg">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Seleccionar servicio a solicitar</h2>
-                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl font-bold">&times;</button>
+      <!-- Área de mensajes -->
+      <div class="p-6 bg-gray-50">
+        <div id="message-box" class="space-y-4 p-6 h-96 overflow-y-auto bg-white rounded-lg shadow-inner">
+          {% for message in messages %}
+            <div class="flex {% if message.sender == user %}justify-end{% else %}justify-start{% endif %} animate-fade-in">
+              <div class="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-sm {% if message.sender == user %}bg-brand-primary text-white{% else %}bg-gray-200 text-gray-800{% endif %}">
+                <p class="break-words">{{ message.content }}</p>
+                <span class="text-xs {% if message.sender == user %}text-white/70{% else %}text-gray-500{% endif %} block text-right mt-1">
+                  {{ message.timestamp|date:"h:i A" }}
+                </span>
+              </div>
             </div>
-            <div class="space-y-3 max-h-80 overflow-y-auto">
-                {% for service in chat.provider.service_provider_profile.services.all %}
-                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-lg border">
-                        <div>
-                            <p class="font-semibold text-gray-700">{{ service.name }}</p>
-                            <p class="text-sm text-gray-500">${{ service.rate|floatformat:0 }}</p>
-                        </div>
-                        <a href="{% url 'create_booking' chat.id service.id %}" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg">Solicitar</a>
-                    </div>
-                {% empty %}
-                    <p class="text-center text-gray-500 py-4">Este proveedor no tiene servicios disponibles para solicitar.</p>
-                {% endfor %}
+          {% empty %}
+            <div class="flex flex-col items-center justify-center h-full text-center py-8">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <p class="text-gray-500 font-medium">Aún no hay mensajes</p>
+              <p class="text-sm text-gray-400 mt-1">¡Inicia la conversación!</p>
             </div>
+          {% endfor %}
         </div>
+      </div>
+
+      <!-- Área de entrada de mensajes -->
+      <div class="p-6 bg-white border-t border-gray-200">
+        <form id="message-form" action="{% url 'send_message' chat.id %}" method="post" 
+              class="flex gap-3 items-end">
+          {% csrf_token %}
+          <textarea name="content" required 
+                    class="flex-1 p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition resize-none" 
+                    placeholder="Escribe tu mensaje..." 
+                    rows="1"></textarea>
+          
+          <button id="send-message-btn" type="submit" 
+                  class="px-6 py-3 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-full shadow-md shadow-brand-primary/30 hover:shadow-lg hover:shadow-brand-secondary/30 transition-all duration-300 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+            Enviar
+          </button>
+          
+          {% if user.is_service_seeker %}
+          <button id="booking-modal-btn" type="button" 
+                  class="px-6 py-3 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-full shadow-md shadow-brand-primary/30 hover:shadow-lg hover:shadow-brand-secondary/30 transition-all duration-300 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Solicitar
+          </button>
+          {% endif %}
+        </form>
+      </div>
+
+      <!-- Botones de navegación -->
+      <div class="p-6 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row gap-4">
+        <a href="{% url 'chat_list' %}" 
+        class="flex-1 text-center px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-full hover:bg-brand-secondary !hover:text-white transition-all duration-300">
+        Volver a mis chats
+        </a>
+
+        <a href="{% url 'profile' %}" 
+        class="flex-1 text-center px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-full hover:bg-brand-secondary !hover:text-white transition-all duration-300">
+        Volver a mi perfil
+        </a>
+      </div>
+
     </div>
-    {% endif %}
+  </div>
+</section>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- Código existente para el menú y el modal ---
-        
-        const bookingModal = document.getElementById('booking-modal');
-        const bookingModalBtn = document.getElementById('booking-modal-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
+<!-- Modal de selección de servicio -->
+{% if user.is_service_seeker %}
+<div id="booking-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+  <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-scale-in">
+    
+    <div class="mb-6 pb-4 border-b flex justify-between items-center">
+      <h2 class="text-2xl font-bold text-brand-text">Seleccionar Servicio</h2>
+      <button id="close-modal-btn" 
+              class="text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+      {% for service in chat.provider.service_provider_profile.services.all %}
+        <div class="flex justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-brand-secondary transition-colors duration-300">
+          <div class="flex-1">
+            <p class="font-bold text-brand-text">{{ service.name }}</p>
+            <p class="text-sm text-gray-600 mt-1">
+              <span class="font-semibold text-brand-secondary">${{ service.rate|floatformat:0 }}</span>
+            </p>
+          </div>
+          <a href="{% url 'create_booking' chat.id service.id %}" 
+             class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full shadow-md shadow-green-500/30 hover:shadow-lg hover:shadow-green-600/30 transition-all duration-300">
+            Solicitar
+          </a>
+        </div>
+      {% empty %}
+        <div class="text-center py-12">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+          </svg>
+          <p class="text-gray-500 font-medium">No hay servicios disponibles</p>
+          <p class="text-sm text-gray-400 mt-2">Este proveedor aún no ha publicado servicios</p>
+        </div>
+      {% endfor %}
+    </div>
+    
+  </div>
+</div>
+{% endif %}
 
-        if (bookingModal && bookingModalBtn && closeModalBtn) {
-            bookingModalBtn.addEventListener('click', () => {
-                bookingModal.classList.remove('hidden');
-            });
-            closeModalBtn.addEventListener('click', () => {
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bookingModal = document.getElementById('booking-modal');
+    const bookingModalBtn = document.getElementById('booking-modal-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+
+    if (bookingModal && bookingModalBtn && closeModalBtn) {
+        bookingModalBtn.addEventListener('click', () => {
+            bookingModal.classList.remove('hidden');
+        });
+        closeModalBtn.addEventListener('click', () => {
+            bookingModal.classList.add('hidden');
+        });
+        bookingModal.addEventListener('click', (e) => {
+            if (e.target === bookingModal) {
                 bookingModal.classList.add('hidden');
-            });
-            bookingModal.addEventListener('click', (e) => {
-                if (e.target === bookingModal) {
-                    bookingModal.classList.add('hidden');
-                }
-            });
-        }
-        
-        const messageForm = document.getElementById('message-form');
-        const messageInput = messageForm.querySelector("textarea[name='content']");
-        const sendButton = document.getElementById('send-message-btn');
-
-        messageInput.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendButton.click();
             }
         });
+    }
+    
+    const messageForm = document.getElementById('message-form');
+    const messageInput = messageForm.querySelector("textarea[name='content']");
+    const sendButton = document.getElementById('send-message-btn');
+    const messageBox = document.getElementById('message-box');
+
+    // Auto-scroll al final de los mensajes
+    if (messageBox) {
+        messageBox.scrollTop = messageBox.scrollHeight;
+    }
+
+    // Enviar con Enter (sin Shift)
+    messageInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendButton.click();
+        }
     });
-    </script>
+
+    // Auto-resize del textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+});
+</script>
+
+<style>
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+
+.animate-scale-in {
+    animation: scale-in 0.2s ease-out;
+}
+</style>
 
 {% endblock %}
