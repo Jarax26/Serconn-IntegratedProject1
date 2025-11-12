@@ -127,4 +127,18 @@
         </section>
 
     </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Menú desplegable de filtros
+        const filterToggleBtn = document.getElementById('filter-toggle-btn');
+        const filterContainer = document.getElementById('filter-container');
+
+        if (filterToggleBtn && filterContainer) {
+            filterToggleBtn.addEventListener('click', function() {
+                filterContainer.classList.toggle('hidden');
+            });
+        }
+    });
+    </script>
 {% endblock %}
