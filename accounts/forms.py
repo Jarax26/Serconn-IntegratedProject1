@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from datetime import date
 from .models import User, ServiceProvider, Availability
+from .face_validator import validate_face_quality
 
 class CustomUserCreationForm(UserCreationForm):
     """
@@ -111,14 +112,24 @@ class CustomUserCreationForm(UserCreationForm):
 
     def clean_user_picture(self):
         """
-        Valida que se haya subido una imagen y que no exceda el tamaño máximo de 2MB.
+        Valida que se haya subido una imagen, que no exceda el tamaño máximo de 2MB y que contenga al menos un rostro detectado.
         """
         image = self.cleaned_data.get("user_picture", False)
         if not image:
             # Esta validación se maneja con `required=True` en la definición del campo.
             return image
+        # Validar el tamaño de la imagen (máximo 2MB)
         if image.size > 2 * 1024 * 1024:  # 2MB
-            raise ValidationError("La imagen no debe superar los 2MB.", code='image_too_large')
+            raise ValidationError(
+                "La imagen no debe superar los 2MB.", 
+                code='image_too_large'
+            )
+        
+        # ===== VALIDACIÓN DE ROSTRO =====
+        is_valid, error_message = validate_face_quality(image)
+        if not is_valid:
+            raise ValidationError(error_message or "Error desconocido al validar la imagen.", code='no_face_detected')
+        
         return image
 
     def save(self, commit=True):

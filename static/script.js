@@ -172,6 +172,15 @@ document.addEventListener('DOMContentLoaded', () => {
             showError(fieldId, message);
             return false;
         }
+        
+        // Validar que sea una imagen
+        const file = input.files[0];
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            showError(fieldId, 'Por favor, sube un archivo de imagen válido (JPG, PNG, GIF, WEBP).');
+            return false;
+        }
+        
         return true;
     }
     
