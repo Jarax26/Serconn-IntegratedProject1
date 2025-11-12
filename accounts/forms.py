@@ -179,7 +179,7 @@ class EditProfileForm(forms.ModelForm):
             "user_city": forms.Select(attrs={"class": "border rounded-lg p-2 w-full"}),
             "user_address": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
             "user_phone": forms.TextInput(attrs={"class": "border rounded-lg p-2 w-full"}),
-            "user_picture": forms.ClearableFileInput(attrs={"class": "border rounded-lg p-2 w-full"}),
+            "user_picture": forms.FileInput(attrs={"class": "border rounded-lg p-2 w-full"}),
         }
         labels = {
             "first_name": "Nombres",
@@ -190,6 +190,52 @@ class EditProfileForm(forms.ModelForm):
             "email": "Correo Electrónico",
             "user_picture": "Foto de Perfil",
         }
+
+    def clean_user_picture(self):
+        """
+        Valida la foto de perfil solo si se está subiendo una nueva imagen.
+        Si no se sube nada nuevo, mantiene la imagen anterior.
+        """
+        image = self.cleaned_data.get("user_picture")
+        
+        # Si no se subió una nueva imagen, retornar None (mantiene la anterior)
+        if not image:
+            return image
+        
+        # Si el usuario marcó "Clear" (borrar imagen), permitirlo
+        if image is False:
+            return image
+        
+        # Si se subió una nueva imagen, validarla
+        # Validar el tamaño de la imagen (máximo 2MB)
+        if hasattr(image, 'size') and image.size > 2 * 1024 * 1024:  # 2MB
+            raise ValidationError(
+                "La imagen no debe superar los 2MB.", 
+                code='image_too_large'
+            )
+        
+        # ===== VALIDACIÓN DE ROSTRO =====
+        # Solo validar si es un archivo nuevo (tiene el método 'read')
+        if hasattr(image, 'read'):
+            is_valid, error_message = validate_face_quality(image)
+            if not is_valid:
+                raise ValidationError(
+                    error_message or "Error desconocido al validar la imagen.", 
+                    code='no_face_detected'
+                )
+        
+        return image
+    
+    def clean_user_phone(self):
+        """
+        Valida que el teléfono contenga solo dígitos y tenga una longitud mínima de 7.
+        """
+        phone = self.cleaned_data.get('user_phone')
+        if phone and not phone.isdigit():
+            raise ValidationError("El número de teléfono debe contener solo dígitos.", code='invalid_phone_format')
+        if phone and len(phone) < 7:
+            raise ValidationError("El número de teléfono debe tener al menos 7 dígitos.", code='invalid_phone_length')
+        return phone
 
 class AvailabilityForm(forms.ModelForm):
     class Meta:

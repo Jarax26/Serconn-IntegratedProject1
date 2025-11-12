@@ -4,6 +4,13 @@
 
 {% block content %}
     <main class="max-w-3xl mx-auto mt-10 bg-white rounded-2xl shadow-lg p-8">
+        {% if messages %}
+                {% for message in messages %}
+                    <div class="bg-green-100 text-green-800 p-4 rounded-lg mb-4 text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+        {% endif %}
         <div class="flex items-center gap-6">
             {% if user.user_picture %}
                 <img src="{{ user.user_picture.url }}" alt="Foto de perfil" class="w-24 h-24 rounded-full object-cover">

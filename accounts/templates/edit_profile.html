@@ -8,10 +8,51 @@
 
         <form method="post" enctype="multipart/form-data" class="space-y-4">
             {% csrf_token %}
-            {{ form.as_p }}
+            
+            <!-- Información Personal -->
+            <div class="space-y-4">               
+                {% for field in form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-brand-text font-semibold mb-2">
+                            {{ field.label }}
+                        </label>
+                        
+                        {{ field }}
+                        
+                        <!-- Mensaje de error del campo -->
+                        {% if field.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ field.errors|first }}</p>
+                        {% endif %}
+                        
+                        <!-- Ayuda especial para la foto de perfil -->
+                        {% if field.name == 'user_picture' %}
+                            <p class="text-xs text-gray-600 mt-2">
+                                La foto debe mostrar claramente tu rostro. Tamaño máximo: 2MB
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
 
+            <!-- Descripción del Proveedor (si aplica) -->
             {% if provider_form %}
-                {{ provider_form.as_p }}
+                <div class="space-y-4 pt-4 border-t">
+                    <h3 class="text-xl font-semibold text-brand-text border-b pb-2">Información Profesional</h3>
+                    
+                    {% for field in provider_form %}
+                        <div>
+                            <label for="{{ field.id_for_label }}" class="block text-brand-text font-semibold mb-2">
+                                {{ field.label }}
+                            </label>
+                            
+                            {{ field }}
+                            
+                            {% if field.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ field.errors|first }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
 
 
@@ -20,6 +61,12 @@
                 <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Guardar cambios</button>
             </div>
         </form>
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-800">
+                <strong>Nota:</strong> Si cambias tu foto de perfil, asegúrate de que tu rostro sea claramente visible. 
+                Se rechazarán fotos grupales o donde no se pueda identificar tu cara.
+            </p>
+        </div>
 
     </div>
 </main>

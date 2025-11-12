@@ -70,8 +70,10 @@ def edit_profile_view(request):
             user_form.save()
             if provider_form:
                 provider_form.save()
+            messages.success(request, "Tu perfil se ha actualizado correctamente.")
             return redirect("profile")
     else:
+        
         user_form = EditProfileForm(instance=user)
         provider_form = ServiceProviderForm(instance=service_provider) if service_provider else None
     return render(request, "edit_profile.html", {"form": user_form, "provider_form": provider_form})
