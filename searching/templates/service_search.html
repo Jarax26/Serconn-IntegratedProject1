@@ -127,39 +127,4 @@
         </section>
 
     </main>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Menú desplegable del perfil
-        const menuBtn = document.getElementById('profile-menu-btn');
-        const dropdown = document.getElementById('profile-dropdown');
-
-        if (menuBtn && dropdown) {
-            menuBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                dropdown.classList.toggle('hidden');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!dropdown.classList.contains('hidden')) {
-                    dropdown.classList.add('hidden');
-                }
-            });
-
-            dropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-
-        // Menú desplegable de filtros
-        const filterToggleBtn = document.getElementById('filter-toggle-btn');
-        const filterContainer = document.getElementById('filter-container');
-
-        if (filterToggleBtn && filterContainer) {
-            filterToggleBtn.addEventListener('click', function() {
-                filterContainer.classList.toggle('hidden');
-            });
-        }
-    });
-    </script>
 {% endblock %}
