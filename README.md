@@ -1,6 +1,6 @@
 # SERCONN - IntegratedProject1
 
-**SERCONN** is a platform designed to connect service seekers with service providers. It offers a comprehensive solution for searching, booking, and managing various professional services. The platform ensures a secure and efficient process through a robust backend developed with Django and a real-time communication system.
+**SERCONN** is a platform designed to connect service seekers with service providers. It offers a complete solution for searching, booking, and managing professional services. The platform ensures an efficient and structured process through a Django backend and a responsive interface styled with Tailwind CSS.
 
 ---
 
@@ -16,24 +16,19 @@ The application is currently configured for local development. The client-side, 
 
 - **Backend:** Python + Django  
 - **Database:** SQLite3 (default for local development)  
-- **External Integrations (planned):**
-  - Google Calendar API
-  - Gemini API
+- **Styling:** TailwindCSS (requires Node.js for building styles)
 
 ---
 
 ## 🧩 Component Architecture
 
-The core of the application is divided into four main components:
+The core of the application is divided into three main components:
 
 - **`accounts`**  
   Manages user registration, login, profile editing, and the rating system.
 
 - **`searching`**  
   Handles all service search functionalities, including category, location, and keyword-based filters.
-
-- **`payments`**  
-  Processes all financial transactions securely and manages payment history.
 
 - **`interactions`**  
   Facilitates real-time communication between users and manages the booking lifecycle.
@@ -57,13 +52,19 @@ Relational integrity ensures smooth flow of information and data consistency.
 
 Follow these steps to set up and run the project locally.
 
+---
+
 ### ✅ Prerequisites
 
 Make sure you have the following installed:
 
 - Python 3.8 or higher  
 - `pip` (Python package manager)  
-- Git
+- Git  
+- **Node.js 18+** (required for TailwindCSS)  
+- **npm** (comes with Node)  
+
+---
 
 ### 📦 Installation
 
@@ -79,11 +80,22 @@ python -m venv venv
 source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 ```
 
-3. Install the required packages:
+3. Install the python required dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-4. Database setup:
+
+4. Install Node/Tailwind dependencies (inside the project root):
+```bash
+npm install
+```
+
+5. Build Tailwind styles (required before running the app):
+```bash
+npm run build:css
+```
+
+6. Database setup:
 The project is configured to use SQLite3 by default for local development. No additional setup is required.
 
 ### ▶️ Running the Application
